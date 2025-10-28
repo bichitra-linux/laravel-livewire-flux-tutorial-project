@@ -1,69 +1,78 @@
 <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
     <!-- Hero Section -->
-    <flux:spacer />
-    <div class="text-center">
-        <flux:heading size="2xl">Welcome to the Blog</flux:heading>
-        <flux:subheading size="lg" class="mb-8">Your one-stop destination for all things blogging.</flux:subheading>
-        <div class="flex justify-center gap-4">
-            <flux:button href="#features" variant="primary">Explore Features</flux:button>
-            <flux:button href="#posts" variant="outline">Read Posts</flux:button>
+    <div class="py-20 px-6 text-center">
+        <div class="max-w-4xl mx-auto">
+            <h1 class="text-5xl font-bold text-gray-900 dark:text-white mb-6">Welcome to the Blog</h1>
+            <p class="text-xl text-gray-600 dark:text-gray-300 mb-8">Your one-stop destination for all things blogging.</p>
+            <div class="flex justify-center space-x-4">
+                <a href="#features" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition">Explore Features</a>
+                <a href="#posts" class="bg-white border border-blue-600 text-blue-600 font-medium py-3 px-6 rounded-lg hover:bg-blue-50 transition">Read Posts</a>
+            </div>
         </div>
     </div>
-    <flux:spacer />
 
     <!-- Features Section -->
-    <flux:spacer />
-    <div id="features" class="bg-white dark:bg-gray-800 py-16">
+    <section id="features" class="py-16 bg-white dark:bg-gray-800">
         <div class="max-w-6xl mx-auto px-6">
-            <flux:heading size="xl" class="text-center mb-12">Features</flux:heading>
+            <h2 class="text-3xl font-bold text-center text-gray-900 dark:text-white mb-12">Features</h2>
             <div class="grid md:grid-cols-3 gap-8">
-                <flux:card>
-                    <div class="text-center">
-                        <flux:icon name="plus" class="w-16 h-16 mx-auto mb-4 text-blue-600" />
-                        <flux:heading size="md" class="mb-2">Easy to Use</flux:heading>
-                        <flux:subheading size="sm">Our platform is designed for simplicity and ease of use.</flux:subheading>
+                <div class="p-6 rounded-lg bg-white dark:bg-gray-900 shadow text-center">
+                    <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-blue-100 flex items-center justify-center">
+                        <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
                     </div>
-                </flux:card>
-                <!-- Add more feature cards here if needed -->
+                    <h3 class="text-xl font-semibold mb-2">Easy to Use</h3>
+                    <p class="text-gray-600 dark:text-gray-300">Our platform is designed for simplicity and ease of use.</p>
+                </div>
+
+                <div class="p-6 rounded-lg bg-white dark:bg-gray-900 shadow text-center">
+                    <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-green-100 flex items-center justify-center">
+                        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"/></svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Secure & Private</h3>
+                    <p class="text-gray-600 dark:text-gray-300">Authentication and data protection built-in.</p>
+                </div>
+
+                <div class="p-6 rounded-lg bg-white dark:bg-gray-900 shadow text-center">
+                    <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-purple-100 flex items-center justify-center">
+                        <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636"/></svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Interactive</h3>
+                    <p class="text-gray-600 dark:text-gray-300">Livewire powers real-time interactions.</p>
+                </div>
             </div>
         </div>
-    </div>
-    <flux:spacer />
+    </section>
 
     <!-- Posts Section -->
-    <flux:spacer />
-    <div id="posts" class="bg-gray-50 dark:bg-gray-900 py-16">
+    <section id="posts" class="py-16 bg-gray-50 dark:bg-gray-900">
         <div class="max-w-4xl mx-auto px-6">
-            <flux:heading size="xl" class="text-center mb-6">Latest Posts</flux:heading>
-            <div class="space-y-4">
-                <flux:card>
-                    <flux:heading size="md">Post 1</flux:heading>
-                    <flux:subheading size="sm">Brief description of post 1.</flux:subheading>
-                </flux:card>
-                <flux:card>
-                    <flux:heading size="md">Post 2</flux:heading>
-                    <flux:subheading size="sm">Brief description of post 2.</flux:subheading>
-                </flux:card>
-                <flux:card>
-                    <flux:heading size="md">Post 3</flux:heading>
-                    <flux:subheading size="sm">Brief description of post 3.</flux:subheading>
-                </flux:card>
-            </div>
+            <h2 class="text-3xl font-bold text-center text-gray-900 dark:text-white mb-6">Latest Posts</h2>
+            <ul class="space-y-4">
+                <li class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+                    <h3 class="text-xl font-semibold">Post 1</h3>
+                    <p class="text-gray-600 dark:text-gray-300">Brief description of post 1.</p>
+                </li>
+                <li class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+                    <h3 class="text-xl font-semibold">Post 2</h3>
+                    <p class="text-gray-600 dark:text-gray-300">Brief description of post 2.</p>
+                </li>
+                <li class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+                    <h3 class="text-xl font-semibold">Post 3</h3>
+                    <p class="text-gray-600 dark:text-gray-300">Brief description of post 3.</p>
+                </li>
+            </ul>
         </div>
-    </div>
-    <flux:spacer />
+    </section>
 
     <!-- Newsletter Section -->
-    <flux:spacer />
-    <div class="bg-blue-600 text-white py-16">
+    <section class="py-16 bg-blue-600 text-white">
         <div class="max-w-4xl mx-auto px-6 text-center">
-            <flux:heading size="xl" class="mb-4">Subscribe to our Newsletter</flux:heading>
-            <flux:subheading size="lg" class="mb-8">Stay updated with the latest posts and features.</flux:subheading>
+            <h2 class="text-3xl font-bold mb-4">Subscribe to our Newsletter</h2>
+            <p class="text-xl mb-8">Stay updated with the latest posts and features.</p>
             <form class="flex justify-center gap-4">
-                <flux:input type="email" placeholder="Enter your email" required />
-                <flux:button type="submit" variant="outline">Subscribe</flux:button>
+                <input type="email" name="email" placeholder="Enter your email" required class="py-3 px-4 rounded-lg text-gray-900" />
+                <button type="submit" class="bg-white text-blue-600 font-medium py-3 px-6 rounded-lg hover:bg-gray-100 transition">Subscribe</button>
             </form>
         </div>
-    </div>
-    <flux:spacer />
+    </section>
 </div>

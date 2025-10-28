@@ -47,20 +47,18 @@
     <section id="posts" class="py-16 bg-gray-50 dark:bg-gray-900">
         <div class="max-w-4xl mx-auto px-6">
             <h2 class="text-3xl font-bold text-center text-gray-900 dark:text-white mb-6">Latest Posts</h2>
-            <ul class="space-y-4">
-                <li class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-                    <h3 class="text-xl font-semibold">Post 1</h3>
-                    <p class="text-gray-600 dark:text-gray-300">Brief description of post 1.</p>
-                </li>
-                <li class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-                    <h3 class="text-xl font-semibold">Post 2</h3>
-                    <p class="text-gray-600 dark:text-gray-300">Brief description of post 2.</p>
-                </li>
-                <li class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-                    <h3 class="text-xl font-semibold">Post 3</h3>
-                    <p class="text-gray-600 dark:text-gray-300">Brief description of post 3.</p>
-                </li>
-            </ul>
+            @if($posts->isEmpty())
+                <p class="text-gray-600 dark:text-gray-300">No posts available at the moment.</p>
+            @else
+                <div class="">
+                    @foreach($posts as $post)
+                    <x-post-card :post="$post" class="mb-6"/>
+                    @endforeach
+                </div>
+                <div>
+                    <a href="{{ route('posts.index') }}" class="text-blue-600 hover:underline">View All Posts</a>
+                </div>
+            @endif
         </div>
     </section>
 
@@ -70,7 +68,7 @@
             <h2 class="text-3xl font-bold mb-4">Subscribe to our Newsletter</h2>
             <p class="text-xl mb-8">Stay updated with the latest posts and features.</p>
             <form class="flex justify-center gap-4">
-                <input type="email" name="email" placeholder="Enter your email" required class="py-3 px-4 rounded-lg text-gray-900" />
+                <input type="email" name="email" placeholder="Enter your email" required class="py-3 px-4 rounded-lg text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800" />
                 <button type="submit" class="bg-white text-blue-600 font-medium py-3 px-6 rounded-lg hover:bg-gray-100 transition">Subscribe</button>
             </form>
         </div>

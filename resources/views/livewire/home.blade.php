@@ -1,76 +1,146 @@
-<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
-    <!-- Hero Section -->
-    <div class="py-20 px-6 text-center">
-        <div class="max-w-4xl mx-auto">
-            <h1 class="text-5xl font-bold text-gray-900 dark:text-white mb-6">Welcome to the Blog</h1>
-            <p class="text-xl text-gray-600 dark:text-gray-300 mb-8">Your one-stop destination for all things blogging.</p>
-            <div class="flex justify-center space-x-4">
-                <a href="#features" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition">Explore Features</a>
-                <a href="#posts" class="bg-white border border-blue-600 text-blue-600 font-medium py-3 px-6 rounded-lg hover:bg-blue-50 transition">Read Posts</a>
+<div> {{-- SINGLE ROOT for Livewire component --}}
+    @php $posts = $posts ?? collect(); @endphp
+
+
+    {{-- Categories filter (Livewire-bound) --}}
+    <div class="max-w-7xl mx-auto px-6 pb-4">
+        <div class="flex items-center gap-3 overflow-x-auto">
+            <button wire:click="$set('category', null)" class="px-3 py-1 rounded {{ !$category ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-700' }}">All</button>
+            @foreach($categories ?? [] as $cat)
+                <button wire:click="$set('category', '{{ $cat->slug }}')" class="px-3 py-1 rounded {{ $category === $cat->slug ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-700' }}">
+                    {{ $cat->name }}
+                </button>
+            @endforeach
+        </div>
+    </div>
+
+    {{-- Search (Livewire-bound) --}}
+    <div class="max-w-7xl mx-auto px-6 pb-4">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex items-center bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden">
+                <input
+                    wire:model.debounce.500ms="search"
+                    type="search"
+                    placeholder="Search articles, topics, authors..."
+                    class="w-full px-4 py-3 bg-transparent placeholder-gray-500 focus:outline-none text-gray-900 dark:text-gray-100"
+                    aria-label="Search articles"
+                />
+                <button wire:click="$set('search', '')" class="px-4 py-3 text-sm text-gray-600 dark:text-gray-200 hover:underline">Clear</button>
             </div>
         </div>
     </div>
 
-    <!-- Features Section -->
-    <section id="features" class="py-16 bg-white dark:bg-gray-800">
-        <div class="max-w-6xl mx-auto px-6">
-            <h2 class="text-3xl font-bold text-center text-gray-900 dark:text-white mb-12">Features</h2>
-            <div class="grid md:grid-cols-3 gap-8">
-                <div class="p-6 rounded-lg bg-white dark:bg-gray-900 shadow text-center">
-                    <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-blue-100 flex items-center justify-center">
-                        <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                    </div>
-                    <h3 class="text-xl font-semibold mb-2">Easy to Use</h3>
-                    <p class="text-gray-600 dark:text-gray-300">Our platform is designed for simplicity and ease of use.</p>
+    <div class="min-h-screen">
+        <div class="max-w-7xl mx-auto px-6 py-6">
+
+            {{-- Top hero + featured article --}}
+            <div class="grid md:grid-cols-12 gap-8">
+                <div class="md:col-span-8">
+                    @if($posts->isNotEmpty())
+                        @php $featured = $posts->first(); @endphp
+                        <article class="relative rounded-lg overflow-hidden shadow-lg bg-white dark:bg-gray-800">
+                            <div class="md:flex">
+                                <div class="md:w-1/2 bg-cover bg-center" style="background-image: url('{{ $featured->image ?? asset('images/placeholder.jpg') }}'); min-height: 300px;"></div>
+                                <div class="p-8 md:w-1/2">
+                                    <div class="flex items-center gap-3 text-sm text-gray-500 mb-3">
+                                        <span>{{ optional($featured->user)->name ?? 'Staff' }}</span>
+                                        <span>•</span>
+                                        <span>{{ optional($featured->created_at)->diffForHumans() }}</span>
+                                    </div>
+                                    <h2 class="text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white mb-4">
+                                        <a href="{{ route('posts.show', $featured) }}" class="hover:underline">{{ $featured->title }}</a>
+                                    </h2>
+                                    <p class="text-gray-700 dark:text-gray-300 mb-6 line-clamp-4">{!! \Illuminate\Support\Str::limit(strip_tags($featured->content), 250) !!}</p>
+                                    <div class="flex items-center gap-4">
+                                        <a href="{{ route('posts.show', $featured) }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Read More</a>
+                                        <a href="{{ route('posts.index') }}" class="text-gray-600 dark:text-gray-300 hover:underline">View All Posts</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+                    @else
+                        <div class="rounded-lg p-8 bg-white dark:bg-gray-800 shadow">
+                            <h2 class="text-xl font-bold text-gray-900 dark:text-white">No featured article yet</h2>
+                            <p class="text-gray-600 dark:text-gray-300 mt-2">Check back soon for the latest stories.</p>
+                        </div>
+                    @endif
                 </div>
 
-                <div class="p-6 rounded-lg bg-white dark:bg-gray-900 shadow text-center">
-                    <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-green-100 flex items-center justify-center">
-                        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"/></svg>
+                {{-- Right column / quick links --}}
+                <aside class="md:col-span-4 space-y-6">
+                    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow">
+                        <h3 class="font-bold text-lg text-gray-900 dark:text-white mb-3">Trending</h3>
+                        <ul class="space-y-3 text-sm text-gray-700 dark:text-gray-300">
+                            @forelse($posts->take(5) as $p)
+                                <li>
+                                    <a href="{{ route('posts.show', $p) }}" class="hover:underline">
+                                        <div class="flex items-start gap-3">
+                                            <div class="flex-1">
+                                                <div class="font-medium">{{ $p->title }}</div>
+                                                <div class="text-xs text-gray-500">{{ optional($p->created_at)->diffForHumans() }}</div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                            @empty
+                                <li class="text-gray-500">No trending posts.</li>
+                            @endforelse
+                        </ul>
                     </div>
-                    <h3 class="text-xl font-semibold mb-2">Secure & Private</h3>
-                    <p class="text-gray-600 dark:text-gray-300">Authentication and data protection built-in.</p>
-                </div>
 
-                <div class="p-6 rounded-lg bg-white dark:bg-gray-900 shadow text-center">
-                    <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-purple-100 flex items-center justify-center">
-                        <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636"/></svg>
+                    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow">
+                        <h3 class="font-bold text-lg text-gray-900 dark:text-white mb-3">Topics</h3>
+                        <div class="flex flex-wrap gap-2">
+                            <a href="#" class="text-xs px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded-full hover:bg-gray-200">World</a>
+                            <a href="#" class="text-xs px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded-full hover:bg-gray-200">Technology</a>
+                            <a href="#" class="text-xs px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded-full hover:bg-gray-200">Business</a>
+                            <a href="#" class="text-xs px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded-full hover:bg-gray-200">Lifestyle</a>
+                            <a href="#" class="text-xs px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded-full hover:bg-gray-200">Culture</a>
+                        </div>
                     </div>
-                    <h3 class="text-xl font-semibold mb-2">Interactive</h3>
-                    <p class="text-gray-600 dark:text-gray-300">Livewire powers real-time interactions.</p>
-                </div>
+
+                    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow">
+                        <h3 class="font-bold text-lg text-gray-900 dark:text-white mb-3">Subscribe</h3>
+                        <form action="#" method="POST" class="space-y-3">
+                            <input type="email" name="email" placeholder="Your email" required class="w-full px-3 py-2 rounded bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100" />
+                            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded">Subscribe</button>
+                        </form>
+                    </div>
+                </aside>
             </div>
-        </div>
-    </section>
 
-    <!-- Posts Section -->
-    <section id="posts" class="py-16 bg-gray-50 dark:bg-gray-900">
-        <div class="max-w-4xl mx-auto px-6">
-            <h2 class="text-3xl font-bold text-center text-gray-900 dark:text-white mb-6">Latest Posts</h2>
-            @if($posts->isEmpty())
-                <p class="text-gray-600 dark:text-gray-300">No posts available at the moment.</p>
-            @else
-                <div class="">
-                    @foreach($posts as $post)
-                    <x-post-card :post="$post" class="mb-6"/>
-                    @endforeach
+            {{-- Articles grid --}}
+            <section class="mt-12">
+                <div class="grid md:grid-cols-3 gap-8">
+                    @if($posts->isNotEmpty())
+                        @foreach($posts->skip(1) as $post)
+                            <article class="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow">
+                                <div class="h-40 bg-cover bg-center" style="background-image: url('{{ $post->image ?? asset('images/placeholder.jpg') }}')"></div>
+                                <div class="p-4">
+                                    <div class="text-xs text-gray-500 mb-2">{{ optional($post->created_at)->format('M d, Y') }} • {{ optional($post->user)->name ?? 'Staff' }}</div>
+                                    <h4 class="font-semibold text-lg text-gray-900 dark:text-white mb-2">
+                                        <a href="{{ route('posts.show', $post) }}" class="hover:underline">{{ $post->title }}</a>
+                                    </h4>
+                                    <p class="text-sm text-gray-700 dark:text-gray-300 line-clamp-3">{!! \Illuminate\Support\Str::limit(strip_tags($post->content), 120) !!}</p>
+                                </div>
+                            </article>
+                        @endforeach
+                    @else
+                        <div class="md:col-span-3 bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+                            <p class="text-gray-600 dark:text-gray-300">There are no articles to display yet.</p>
+                        </div>
+                    @endif
                 </div>
-                <div>
-                    <a href="{{ route('posts.index') }}" class="text-blue-600 hover:underline">View All Posts</a>
-                </div>
-            @endif
-        </div>
-    </section>
 
-    <!-- Newsletter Section -->
-    <section class="py-16 bg-blue-600 text-white">
-        <div class="max-w-4xl mx-auto px-6 text-center">
-            <h2 class="text-3xl font-bold mb-4">Subscribe to our Newsletter</h2>
-            <p class="text-xl mb-8">Stay updated with the latest posts and features.</p>
-            <form class="flex justify-center gap-4">
-                <input type="email" name="email" placeholder="Enter your email" required class="py-3 px-4 rounded-lg text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800" />
-                <button type="submit" class="bg-white text-blue-600 font-medium py-3 px-6 rounded-lg hover:bg-gray-100 transition">Subscribe</button>
-            </form>
+                {{-- Pagination --}}
+                <div class="mt-8">
+                    @if(method_exists($posts, 'links'))
+                        <div class="bg-white dark:bg-gray-800 p-4 rounded shadow">
+                            {{ $posts->links() }}
+                        </div>
+                    @endif
+                </div>
+            </section>
         </div>
-    </section>
+    </div>
 </div>

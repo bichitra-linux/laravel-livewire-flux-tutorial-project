@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -11,9 +12,16 @@ class PostController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $posts = Auth::user()->posts()->paginate(10);
+        $query = Post::with('user', 'category')->latestPosts();
+
+        if ($request->filled('category')) {
+            $cat = Category::where('slug', $request->category)->orWhere('id', $request->category)->first();
+            if ($cat) $query->where('category_id', $cat->id);
+
+        }
+        $posts = $query->paginate(10);
         return view('posts.index', compact('posts'));
     }
 

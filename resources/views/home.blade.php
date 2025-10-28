@@ -1,3 +1,3 @@
-<x-layouts.app.header :title="__('Home')">
-    <livewire:home />
-</x-layouts.app.header>
+<x-blog-header :title="__('Home')" />
+<livewire:home />
+<x-footer />

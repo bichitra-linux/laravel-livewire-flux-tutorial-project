@@ -12,7 +12,7 @@ class Post extends Model
 {
 
     use HasFactory;
-    protected $fillable =[
+    protected $fillable = [
         'title',
         'content',
         'user_id',
@@ -20,19 +20,28 @@ class Post extends Model
         'status',
     ];
 
-    public function user(){
+    public function user()
+    {
         return $this->belongsTo(User::class);
     }
 
-    public function category(){
+    public function category()
+    {
         return $this->belongsTo(Category::class);
     }
 
-    public function getExcerptAttribute(){
+    public function getExcerptAttribute()
+    {
         return Str::limit(strip_tags($this->content), 150);
     }
 
-    public function scopeLatestPosts($query){
+    public function getStatusLabelAttribute()
+    {
+        return $this->status->label();
+    }
+
+    public function scopeLatestPosts($query)
+    {
         return $query->orderBy('created_at', 'desc');
     }
 

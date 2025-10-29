@@ -16,7 +16,7 @@
             </div>
             <div class="mb-3">
                 <label for="category_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Category</label>
-                <select name="category_id" id="category_id" class="mt-1 block w-full border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                <select name="category_id" id="category_id" class="mt-1 block w-full border text-gray-700 dark:text-gray-100 border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 bg-gray-100 dark:bg-gray-800">
                     <option value="">— Select category —</option>
                     @foreach($categories as $cat)
                         <option value="{{ $cat->id }}" @selected(old('category_id', $post->category_id ?? '') == $cat->id)>

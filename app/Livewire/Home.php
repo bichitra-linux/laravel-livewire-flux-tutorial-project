@@ -10,7 +10,7 @@ use Livewire\WithPagination;
 class Home extends Component
 {
     use WithPagination;
-    public $perPage = 6;
+    public $perPage = 7;
     public $search = '';
 
     public $category = null;

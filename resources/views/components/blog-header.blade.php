@@ -7,12 +7,12 @@
 <body class="antialiased bg-gray-50 dark:bg-gray-900">
 
 <div> {{-- single root wrapper for the component --}}
-    <header class="bg-white dark:bg-gray-900 border-b shadow-sm">
-        <div class="max-w-auto mx-auto px-6">
+    <header class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6">
             <div class="flex items-center justify-between h-20">
                 <div class="flex items-center gap-4">
-                    <a href="{{ url('/') }}" class="flex items-center gap-3">
-                        <div class="w-12 h-12 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold">
+                    <a href="{{ url('/') }}" class="flex items-center gap-3 hover:opacity-80 transition-opacity duration-200">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white flex items-center justify-center font-bold shadow-md">
                             B
                         </div>
                         <div>
@@ -29,27 +29,43 @@
                     @endisset
                 </div>
 
-                <nav class="hidden md:flex items-center space-x-5">
-                    <a href="{{ route('posts.index') }}" class="text-gray-700 dark:text-gray-200 hover:underline">All Posts</a>
-                    <a href="{{ route('posts.index', ['category' => 'politics']) }}" class="text-gray-700 dark:text-gray-200 hover:underline">Politics</a>
-                    <a href="{{ route('posts.index', ['category' => 'tech']) }}" class="text-gray-700 dark:text-gray-200 hover:underline">Tech</a>
-                    <a href="{{ route('posts.index', ['category' => 'culture']) }}" class="text-gray-700 dark:text-gray-200 hover:underline">Culture</a>
+                <nav class="hidden md:flex items-center space-x-6">
+                    <a href="{{ route('posts.index') }}" class="text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 font-medium">All Posts</a>
+                    <a href="{{ route('posts.index', ['category' => 'politics']) }}" class="text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 font-medium">Politics</a>
+                    <a href="{{ route('posts.index', ['category' => 'tech']) }}" class="text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 font-medium">Tech</a>
+                    <a href="{{ route('posts.index', ['category' => 'culture']) }}" class="text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 font-medium">Culture</a>
                 </nav>
 
                 <div class="ml-4 flex items-center gap-3">
-                    <a href="#" class="text-sm text-gray-600 dark:text-gray-300 hover:underline">Subscribe</a>
+                    <a href="#" class="text-sm text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 font-medium">Subscribe</a>
                 </div>
 
-                <button id="theme-toggle" type="button" aria-label="Toogle Theme" class="p-4 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition mr-px">
+                <button id="theme-toggle" type="button" aria-label="Toogle Theme" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-600 ml-2">
                     {{-- Light (sun) icon --}}
-                        <svg id="theme-toggle-light-icon" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 hidden text-yellow-500" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                            <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zM4.22 4.22a1 1 0 011.415 0l.707.707a1 1 0 11-1.414 1.415l-.707-.707a1 1 0 010-1.415zM2 10a1 1 0 011-1h1a1 1 0 110 2H3a1 1 0 01-1-1zm8 5a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zm5.778-8.778a1 1 0 010 1.415l-.707.707a1 1 0 11-1.415-1.414l.707-.708a1 1 0 011.415 0zM16 9a1 1 0 011 1v0a1 1 0 11-2 0 1 1 0 011-1zM4.22 15.778a1 1 0 010-1.415l.707-.707a1 1 0 011.415 1.414l-.707.708a1 1 0 01-1.415 0zM15.778 15.778a1 1 0 00-1.415 0l-.707.707a1 1 0 101.414 1.414l.708-.707a1 1 0 000-1.414zM10 6a4 4 0 100 8 4 4 0 000-8z" />
-                        </svg>
-                        {{-- Dark (moon) icon --}}
-                        <svg id="theme-toggle-dark-icon" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 hidden text-gray-200" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                            <path d="M17.293 13.293A8 8 0 116.707 2.707a7 7 0 1010.586 10.586z" />
-                        </svg>
+                    <svg id="theme-toggle-light-icon" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 hidden text-yellow-500" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zM4.22 4.22a1 1 0 011.415 0l.707.707a1 1 0 11-1.414 1.415l-.707-.707a1 1 0 010-1.415zM2 10a1 1 0 011-1h1a1 1 0 110 2H3a1 1 0 01-1-1zm8 5a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zm5.778-8.778a1 1 0 010 1.415l-.707.707a1 1 0 11-1.415-1.414l.707-.708a1 1 0 011.415 0zM16 9a1 1 0 011 1v0a1 1 0 11-2 0 1 1 0 011-1zM4.22 15.778a1 1 0 010-1.415l.707-.707a1 1 0 011.415 1.414l-.707.708a1 1 0 01-1.415 0zM15.778 15.778a1 1 0 00-1.415 0l-.707.707a1 1 0 101.414 1.414l.708-.707a1 1 0 000-1.414zM10 6a4 4 0 100 8 4 4 0 000-8z" />
+                    </svg>
+                    {{-- Dark (moon) icon --}}
+                    <svg id="theme-toggle-dark-icon" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 hidden text-gray-200" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path d="M17.293 13.293A8 8 0 116.707 2.707a7 7 0 1010.586 10.586z" />
+                    </svg>
                 </button>
+                {{-- Mobile menu button --}}
+                <button id="mobile-menu-toggle" type="button" aria-label="Toggle Menu" class="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 ml-2">
+                    <svg class="w-6 h-6 text-gray-700 dark:text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+            {{-- Mobile menu --}}
+            <div id="mobile-menu" class="md:hidden hidden bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 py-4">
+                <nav class="flex flex-col space-y-4">
+                    <a href="{{ route('posts.index') }}" class="text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 font-medium px-4">All Posts</a>
+                    <a href="{{ route('posts.index', ['category' => 'politics']) }}" class="text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 font-medium px-4">Politics</a>
+                    <a href="{{ route('posts.index', ['category' => 'tech']) }}" class="text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 font-medium px-4">Tech</a>
+                    <a href="{{ route('posts.index', ['category' => 'culture']) }}" class="text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 font-medium px-4">Culture</a>
+                    <a href="#" class="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 font-medium px-4">Subscribe</a>
+                </nav>
             </div>
         </div>
     </header>

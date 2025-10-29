@@ -36,6 +36,12 @@
                     @endforeach
                 </select>
             </div>
+            <div class="mb-4">  {{-- Add image field --}}
+                <label for="image" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Image (optional)</label>
+                <input type="file" id="image" name="image" accept="image/*"
+                    class="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Max 2MB, JPEG/PNG/JPG/GIF only.</p>
+            </div>
             <button type="submit"
                 class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Create Post</button>
         </form>

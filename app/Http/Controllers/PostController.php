@@ -6,6 +6,7 @@ use App\Models\Post;
 use App\Models\Category;
 use App\Enums\PostStatus;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 
 class PostController extends Controller
@@ -45,13 +46,20 @@ class PostController extends Controller
             'content' => 'required|string',
             'category_id' => 'nullable|exists:categories,id',
             'status' => 'required|in:draft,published,archived',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
+
+        $imagePath = null;
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('posts', 'public');
+        }
 
         Auth::user()->posts()->create([
             'title' => $request->title,
             'content' => $request->content,
             'category_id' => $request->category_id,
             'status' => $request->status ? PostStatus::from($request->status) : PostStatus::Draft,
+            'image' => $imagePath,
         ]);
 
         return redirect()->route('posts.index')->with('success', 'Post created successfully.');
@@ -63,7 +71,23 @@ class PostController extends Controller
     public function show(string $id)
     {
         $post = Auth::user()->posts()->findOrFail($id);
-        return view('posts.show', compact('post'));
+
+        // Related posts (same category, exclude current, published only)
+        $related = Post::with('user', 'category')
+            ->where('status', PostStatus::Published)
+            ->where('id', '!=', $post->id)
+            ->when($post->category, fn($q) => $q->where('category_id', $post->category->id))
+            ->latest()
+            ->take(4)
+            ->get();
+
+        // Popular posts (latest 5 published)
+        $popular = Post::where('status', PostStatus::Published)
+            ->latest()
+            ->take(5)
+            ->get();
+
+        return view('posts.show', compact('post', 'related', 'popular'));
     }
 
     /**
@@ -86,13 +110,26 @@ class PostController extends Controller
             'content' => 'required|string',
             'category_id' => 'nullable|exists:categories,id',
             'status' => 'required|in:draft,published,archived',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+
         ]);
         $post = Auth::user()->posts()->findOrFail($id);
+
+        $imagePath = $post->image;  // Keep existing if no new upload
+        if ($request->hasFile('image')) {
+            // Delete old image if exists
+            if ($post->image && Storage::disk('public')->exists($post->image)) {
+                Storage::disk('public')->delete($post->image);
+            }
+            $imagePath = $request->file('image')->store('images', 'public');
+        }
+
         $post->update([
             'title' => $request->title,
             'content' => $request->content,
             'category_id' => $request->category_id,
             'status' => $request->status ? PostStatus::from($request->status) : $post->status,
+            'image' => $imagePath,  
         ]);
 
         return redirect()->route('posts.index')->with('success', 'Post updated successfully.');

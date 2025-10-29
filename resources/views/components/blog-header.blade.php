@@ -30,10 +30,10 @@
                 </div>
 
                 <nav class="hidden md:flex items-center space-x-6">
-                    <a href="{{ route('posts.index') }}" class="text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 font-medium">All Posts</a>
-                    <a href="{{ route('posts.index', ['category' => 'politics']) }}" class="text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 font-medium">Politics</a>
-                    <a href="{{ route('posts.index', ['category' => 'tech']) }}" class="text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 font-medium">Tech</a>
-                    <a href="{{ route('posts.index', ['category' => 'culture']) }}" class="text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 font-medium">Culture</a>
+                    <a href="{{ route('public.posts.index') }}" class="text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 font-medium">All Posts</a>
+                    <a href="{{ route('public.posts.index', ['category' => 'politics']) }}" class="text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 font-medium">Politics</a>
+                    <a href="{{ route('public.posts.index', ['category' => 'tech']) }}" class="text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 font-medium">Tech</a>
+                    <a href="{{ route('public.posts.index', ['category' => 'culture']) }}" class="text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 font-medium">Culture</a>
                 </nav>
 
                 <div class="ml-4 flex items-center gap-3">

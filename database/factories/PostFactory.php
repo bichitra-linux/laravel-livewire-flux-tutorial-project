@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Models\Post;
 use App\Models\User;
 use App\Models\Category;
+use App\Enums\PostStatus;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -27,6 +28,7 @@ class PostFactory extends Factory
             'content' => $this->faker->paragraph,
             'user_id' => User::factory(),
             'category_id' => Category::inRandomOrder()->first()->id ?? null,
+            'status' => PostStatus::Published,  // Use enum
         ];
     }
 }

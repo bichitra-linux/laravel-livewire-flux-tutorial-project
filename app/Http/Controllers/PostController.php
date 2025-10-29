@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use App\Models\Category;
+use App\Enums\PostStatus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -43,12 +44,14 @@ class PostController extends Controller
             'title' => 'required|string|max:255',
             'content' => 'required|string',
             'category_id' => 'nullable|exists:categories,id',
+            'status' => 'required|in:draft,published,archived',
         ]);
 
         Auth::user()->posts()->create([
             'title' => $request->title,
             'content' => $request->content,
             'category_id' => $request->category_id,
+            'status' => $request->status ? PostStatus::from($request->status) : PostStatus::Draft,
         ]);
 
         return redirect()->route('posts.index')->with('success', 'Post created successfully.');
@@ -82,12 +85,14 @@ class PostController extends Controller
             'title' => 'required|string|max:255',
             'content' => 'required|string',
             'category_id' => 'nullable|exists:categories,id',
+            'status' => 'required|in:draft,published,archived',
         ]);
         $post = Auth::user()->posts()->findOrFail($id);
         $post->update([
             'title' => $request->title,
             'content' => $request->content,
             'category_id' => $request->category_id,
+            'status' => $request->status ? PostStatus::from($request->status) : $post->status,
         ]);
 
         return redirect()->route('posts.index')->with('success', 'Post updated successfully.');

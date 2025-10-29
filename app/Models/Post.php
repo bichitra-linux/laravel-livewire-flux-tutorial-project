@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Str;
+use App\Enums\PostStatus;
 
 class Post extends Model
 {
@@ -16,6 +17,7 @@ class Post extends Model
         'content',
         'user_id',
         'category_id',
+        'status',
     ];
 
     public function user(){
@@ -32,6 +34,13 @@ class Post extends Model
 
     public function scopeLatestPosts($query){
         return $query->orderBy('created_at', 'desc');
+    }
+
+    public function casts(): array
+    {
+        return [
+            'status' => PostStatus::class,
+        ];
     }
 }
 

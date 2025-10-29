@@ -15,12 +15,24 @@
                     class="mt-1 block w-full border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"></textarea>
             </div>
             <div class="mb-3">
-                <label for="category_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Category</label>
-                <select name="category_id" id="category_id" class="mt-1 block w-full border text-gray-700 dark:text-gray-100 border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 bg-gray-100 dark:bg-gray-800">
+                <label for="category_id"
+                    class="block text-sm font-medium text-gray-700 dark:text-gray-300">Category</label>
+                <select name="category_id" id="category_id"
+                    class="mt-1 block w-full border text-gray-700 dark:text-gray-100 border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 bg-gray-100 dark:bg-gray-800">
                     <option value="">— Select category —</option>
                     @foreach($categories as $cat)
                         <option value="{{ $cat->id }}" @selected(old('category_id', $post->category_id ?? '') == $cat->id)>
-                            {{ $cat->name }}</option>
+                            {{ $cat->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="mb-4">
+                <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
+                <select id="status" name="status"
+                    class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+                    @foreach(App\Enums\PostStatus::cases() as $status)
+                        <option value="{{ $status->value }}" {{ old('status', $post->status->value ?? '') == $status->value ? 'selected' : '' }}>{{ $status->label() }}</option>
                     @endforeach
                 </select>
             </div>

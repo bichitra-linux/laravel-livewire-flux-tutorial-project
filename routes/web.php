@@ -10,25 +10,23 @@ Route::get('/', function () {
     return view('home');
 })->name('home');
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->name('dashboard');
+// Updated: Dashboard now at /admin/dashboard with auth
+Route::view('admin/dashboard', 'dashboard')
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
+
+// Updated: Posts now at /admin/posts with auth
+Route::resource('admin/posts', PostController::class)->middleware(['auth']);
 
 Route::get('/settings-form', SettingForm::class)->middleware(['auth']);
-Route::resource('posts', PostController::class)->middleware(['auth']);
 
+// Public posts route (no auth)
+Route::get('/posts', [App\Http\Controllers\PublicPostController::class, 'index'])->name('public.posts.index');
+Route::get('/posts/{id}', [App\Http\Controllers\PublicPostController::class, 'show'])->name('public.posts.show');
 
-// Admin-only route example
-Route::get('/admin/dashboard', function () {
-    return 'Admin Dashboard';
-})->middleware(['auth', 'role:admin'])->name('admin.dashboard');
 
 Route::view('about', 'about')
     ->name('about');
-
-Route::view('dashboard', 'dashboard')
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
 
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');

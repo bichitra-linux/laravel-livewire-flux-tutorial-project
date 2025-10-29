@@ -14,8 +14,9 @@
                 <textarea name="content" rows="5" required
                     class="mt-1 block w-full border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"></textarea>
             </div>
-            <div>
-                <select name="category_id" id="category_id" class="w-full">
+            <div class="mb-3">
+                <label for="category_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Category</label>
+                <select name="category_id" id="category_id" class="mt-1 block w-full border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
                     <option value="">— Select category —</option>
                     @foreach($categories as $cat)
                         <option value="{{ $cat->id }}" @selected(old('category_id', $post->category_id ?? '') == $cat->id)>

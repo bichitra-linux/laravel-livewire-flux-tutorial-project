@@ -30,7 +30,8 @@ class PostController extends Controller
      */
     public function create()
     {
-        return view('posts.create');
+        $categories = Category::orderBy('name')->get();
+        return view('posts.create', compact('categories'));
     }
 
     /**
@@ -41,11 +42,13 @@ class PostController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
+            'category_id' => 'nullable|exists:categories,id',
         ]);
 
         Auth::user()->posts()->create([
             'title' => $request->title,
             'content' => $request->content,
+            'category_id' => $request->category_id,
         ]);
 
         return redirect()->route('posts.index')->with('success', 'Post created successfully.');
@@ -66,7 +69,8 @@ class PostController extends Controller
     public function edit(string $id)
     {
         $post = Auth::user()->posts()->findOrFail($id);
-        return view('posts.edit', compact('post'));
+        $categories = Category::orderBy('name')->get();
+        return view('posts.edit', compact('post', 'categories'));
     }
 
     /**
@@ -77,11 +81,13 @@ class PostController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
+            'category_id' => 'nullable|exists:categories,id',
         ]);
         $post = Auth::user()->posts()->findOrFail($id);
         $post->update([
             'title' => $request->title,
             'content' => $request->content,
+            'category_id' => $request->category_id,
         ]);
 
         return redirect()->route('posts.index')->with('success', 'Post updated successfully.');

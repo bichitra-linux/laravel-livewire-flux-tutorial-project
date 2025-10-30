@@ -4,21 +4,23 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Post;
+use App\Models\Tag;
 use App\Enums\PostStatus;
 use App\Models\Category;
+use Illuminate\Support\Facades\Cookie;
 
 class PublicPostController extends Controller
 {
     //
     public function index(Request $request)
     {
-        $query = Post::with('user', 'category')->where('status', PostStatus::Published);
+        $query = Post::with('user', 'category', 'tags')->where('status', PostStatus::Published);
 
         // Handle search (grouped to avoid interfering with other filters)
         if ($request->has('search') && $request->search) {
-            $query->where(function($q) use ($request) {
+            $query->where(function ($q) use ($request) {
                 $q->where('title', 'like', '%' . $request->search . '%')
-                  ->orWhere('content', 'like', '%' . $request->search . '%');
+                    ->orWhere('content', 'like', '%' . $request->search . '%');
             });
         }
 
@@ -30,11 +32,24 @@ class PublicPostController extends Controller
             }
         }
 
+        // Handle tag filter (NEW)
+        if ($request->has('tag') && $request->tag) {
+            $tag = Tag::where('slug', $request->tag)->first();
+            if ($tag) {
+                $query->whereHas('tags', function ($q) use ($tag) {
+                    $q->where('tags.id', $tag->id);
+                });
+            }
+        }
+
         // Handle sorting
         $sort = $request->get('sort', 'newest');
         switch ($sort) {
             case 'oldest':
                 $query->orderBy('created_at', 'asc');
+                break;
+            case 'most_viewed':
+                $query->orderBy('views', 'desc');
                 break;
             case 'title_asc':
                 $query->orderBy('title', 'asc');
@@ -53,25 +68,33 @@ class PublicPostController extends Controller
 
     public function show($id)
     {
-    $post = Post::with('user', 'category')
-        ->where('status', PostStatus::Published)
-        ->findOrFail($id);
+        $post = Post::with('user', 'category', 'tags')
+            ->where('status', PostStatus::Published)
+            ->findOrFail($id);
 
-    // Related posts (same category, exclude current)
-    $related = Post::with('user', 'category')
-        ->where('status', PostStatus::Published)
-        ->where('id', '!=', $post->id)
-        ->when($post->category, fn($q) => $q->where('category_id', $post->category->id))
-        ->latest()
-        ->take(4)
-        ->get();
+        // Track view with cookie to prevent multiple counts from same user
+        $cookieName = 'post_' . $post->id . '_viewed';
 
-    // Popular posts (latest 5 published)
-    $popular = Post::where('status', PostStatus::Published)
-        ->latest()
-        ->take(5)
-        ->get();
+        if (!Cookie::has($cookieName)) {
+            $post->incrementViews();
+            Cookie::queue($cookieName, true, 60 * 24); // 24 hours
+        }
 
-    return view('posts.show', compact('post', 'related', 'popular'));
-}
+        // Related posts (same category, exclude current)
+        $related = Post::with('user', 'category', 'tags')
+            ->where('status', PostStatus::Published)
+            ->where('id', '!=', $post->id)
+            ->when($post->category, fn($q) => $q->where('category_id', $post->category->id))
+            ->latest()
+            ->take(4)
+            ->get();
+
+        // Popular posts (latest 5 published)
+        $popular = Post::where('status', PostStatus::Published)
+            ->latest()
+            ->take(5)
+            ->get();
+
+        return view('posts.show', compact('post', 'related', 'popular'));
+    }
 }

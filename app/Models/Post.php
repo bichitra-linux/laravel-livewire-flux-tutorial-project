@@ -18,6 +18,8 @@ class Post extends Model
         'user_id',
         'category_id',
         'status',
+        'image',
+        'views',
     ];
 
     public function user()
@@ -28,6 +30,11 @@ class Post extends Model
     public function category()
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function tags()
+    {
+        return $this->belongsToMany(Tag::class)->withTimestamps();
     }
 
     public function getExcerptAttribute()
@@ -43,6 +50,28 @@ class Post extends Model
     public function scopeLatestPosts($query)
     {
         return $query->orderBy('created_at', 'desc');
+    }
+
+    public function scopeMostViewed($query, $limit = 5)
+    {
+        return $query->orderBy('views', 'desc')->limit($limit);
+    }
+
+    // Increment views
+    public function incrementViews()
+    {
+        $this->increment('views');
+    }
+
+    // Format views count (1.2K, 1.5M, etc.)
+    public function getFormattedViewsAttribute()
+    {
+        if ($this->views >= 1000000) {
+            return round($this->views / 1000000, 1) . 'M';
+        } elseif ($this->views >= 1000) {
+            return round($this->views / 1000, 1) . 'K';
+        }
+        return $this->views;
     }
 
     public function casts(): array

@@ -7,6 +7,7 @@ use App\Livewire\SettingForm;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\publicPostController;
+use App\Http\Controllers\ReactionController;
 
 Route::get('/', function () {
     return view('home');
@@ -25,6 +26,11 @@ Route::get('/settings-form', SettingForm::class)->middleware(['auth']);
 // Public posts route (no auth)
 Route::get('/posts', [PublicPostController::class, 'index'])->name('public.posts.index');
 Route::get('/posts/{id}', [PublicPostController::class, 'show'])->name('public.posts.show');
+
+Route::middleware(['auth'])->group(function () {
+    Route::post('/posts/{post}/reactions', [ReactionController::class, 'toggle'])->name('reactions.toggle');
+    Route::get('/posts/{post}/reactions/{type?}', [ReactionController::class, 'users'])->name('reactions.users');
+});
 
 
 Route::view('about', 'about')

@@ -132,5 +132,8 @@
         <livewire:footer />
 
         @fluxScripts
+
+            
+
     </body>
 </html>

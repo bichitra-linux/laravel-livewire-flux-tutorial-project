@@ -203,6 +203,18 @@
                         </div>
                     </div>
 
+                    {{-- Post Reactions --}}
+
+                    <div class="border-t border-b border-gray-200 dark:border-gray-700 py-4 my-6">
+                        @auth
+                            <x-post-reactions :post="$post" />
+                        @else
+                            <p class="text-sm text-gray-600 dark:text-gray-400">
+                                <a href="{{ route('login') }}" class="text-blue-600 hover:underline">Login</a> to react to this post
+                            </p>
+                        @endauth
+                    </div>
+
                     {{-- Author Bio --}}
                     <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
                         <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">About the Author</h3>

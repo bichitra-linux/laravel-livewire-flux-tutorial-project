@@ -125,6 +125,12 @@
                                         Read More →
                                     </a>
                                 </div>
+
+                                @auth
+                                    <div class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                                        <x-post-reactions :post="$post" />
+                                    </div>
+                                @endauth
                             </div>
                         </article>
                     @endforeach

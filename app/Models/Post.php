@@ -22,6 +22,8 @@ class Post extends Model
         'views',
     ];
 
+    protected $appends = ['reaction_counts', 'total_reactions'];
+
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -35,6 +37,49 @@ class Post extends Model
     public function tags()
     {
         return $this->belongsToMany(Tag::class)->withTimestamps();
+    }
+
+    public function reactions(){
+        return $this->hasMany(Reaction::class);
+    }
+
+    // Get reaction counts grouped by type
+    public function getReactionCountsAttribute()
+    {
+        // Cache the result to avoid multiple queries
+        if (!isset($this->attributes['_reaction_counts_cache'])) {
+            $counts = $this->reactions()
+                ->selectRaw('type, COUNT(*) as count')
+                ->groupBy('type')
+                ->pluck('count', 'type');
+            
+            $this->attributes['_reaction_counts_cache'] = $counts;
+        }
+        
+        return $this->attributes['_reaction_counts_cache'];
+    }
+
+    // Get total reactions count
+    public function getTotalReactionsAttribute()
+    {
+        return $this->reactions()->count();
+    }
+
+    // Check if user has reacted to this post
+    public function userReaction($userId = null)
+    {
+        $userId = $userId ?? auth()->id();
+        return $this->reactions()->where('user_id', $userId)->first();
+    }
+
+    // Check if current user has reacted with specific type
+    public function hasReaction($type, $userId = null)
+    {
+        $userId = $userId ?? auth()->id();
+        return $this->reactions()
+            ->where('user_id', $userId)
+            ->where('type', $type)
+            ->exists();
     }
 
     public function getExcerptAttribute()

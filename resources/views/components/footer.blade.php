@@ -11,7 +11,7 @@
                     <h3 class="text-lg font-semibold mb-4 text-white">Quick Links</h3>
                     <ul class="space-y-2 text-sm">
                         <li><a href="{{ route('home') }}" class="text-gray-300 hover:text-blue-400 hover:underline transition-colors duration-200">Home</a></li>
-                        <li><a href="{{ route('posts.index') }}" class="text-gray-300 hover:text-blue-400 hover:underline transition-colors duration-200">Posts</a></li>
+                        <li><a href="{{ route('public.posts.index') }}" class="text-gray-300 hover:text-blue-400 hover:underline transition-colors duration-200">Posts</a></li>
                         <li><a href="{{  '#' }}" class="text-gray-300 hover:text-blue-400 hover:underline transition-colors duration-200">Contact</a></li>
                     </ul>
                 </div>
@@ -35,9 +35,46 @@
             <div>
                 <h3 class="text-lg font-semibold mb-4 text-white">Newsletter</h3>
                 <p class="text-sm text-gray-300 mb-4">Subscribe for the latest updates.</p>
-                <form action="#" method="POST" class="space-y-3">
-                    <input type="email" name="email" placeholder="Your email" required class="w-full px-3 py-2 rounded-lg bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200" />
-                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-semibold transition-all duration-200">Subscribe</button>
+                
+                @if(session('newsletter_success'))
+                    <div class="mb-3 p-3 bg-green-500/20 border border-green-500 rounded-lg">
+                        <p class="text-sm text-green-200">{{ session('newsletter_success') }}</p>
+                    </div>
+                @endif
+
+                @if(session('newsletter_error'))
+                    <div class="mb-3 p-3 bg-red-500/20 border border-red-500 rounded-lg">
+                        <p class="text-sm text-red-200">{{ session('newsletter_error') }}</p>
+                    </div>
+                @endif
+
+                @if(session('newsletter_info'))
+                    <div class="mb-3 p-3 bg-blue-500/20 border border-blue-500 rounded-lg">
+                        <p class="text-sm text-blue-200">{{ session('newsletter_info') }}</p>
+                    </div>
+                @endif
+
+                <form action="{{ route('newsletter.subscribe') }}" method="POST" class="space-y-3">
+                    @csrf
+                    <input 
+                        type="email" 
+                        name="email" 
+                        placeholder="Your email" 
+                        required 
+                        class="w-full px-3 py-2 rounded-lg bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 @error('email') @enderror" 
+                    />
+                    @error('email')
+                        <p class="text-xs text-red-400">{{ $message }}</p>
+                    @enderror
+                    
+                    <button 
+                        type="submit" 
+                        class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                        </svg>
+                        Subscribe
+                    </button>
                 </form>
             </div>
         </div>

@@ -46,7 +46,7 @@
                 <div class="lg:col-span-8">
                     @if($posts->isNotEmpty())
                         @php $featured = $posts->first(); @endphp
-                        <article class="relative rounded-xl overflow-hidden shadow-xl bg-gradient-to-r from-white to-gray-100 dark:from-gray-800 dark:to-gray-700 transform hover:scale-105 transition-transform duration-300">
+                        <article class="relative rounded-xl overflow-hidden shadow-xl bg-gradient-to-r from-white to-gray-100 dark:from-gray-800 dark:to-gray-700 transform hover:scale-101 transition-transform duration-600">
                             <div class="lg:flex">
                                 {{-- Featured Image (Fixed path) --}}
                                 @if($featured->image)

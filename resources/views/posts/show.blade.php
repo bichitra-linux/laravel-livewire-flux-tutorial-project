@@ -78,13 +78,77 @@
                         {{-- ✨ MOVE REACTIONS HERE (After Content) ✨ --}}
                         <div class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
                             @auth
+                                {{-- Authenticated: Always show interactive reactions --}}
                                 <x-post-reactions :post="$post" />
                             @else
-                                <div class="text-center py-6">
-                                    <p class="text-sm text-gray-600 dark:text-gray-400">
-                                        <a href="{{ route('login') }}" class="text-blue-600 hover:underline font-medium">Login</a> to react to this post
-                                    </p>
-                                </div>
+                                {{-- Unauthenticated: Show read-only if reactions exist --}}
+                                @if($post->reactions->count() > 0)
+                                    <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-6">
+                                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                                            <svg class="w-5 h-5 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                                            </svg>
+                                            Reactions
+                                        </h3>
+
+                                        {{-- Reaction breakdown --}}
+                                        <div class="flex flex-wrap gap-3 mb-4">
+                                            @php
+                                                $reactionGroups = $post->reactions->groupBy('type');
+                                                $emojis = [
+                                                    'like' => '👍',
+                                                    'love' => '❤️',
+                                                    'care' => '🤗',
+                                                    'haha' => '😂',
+                                                    'wow' => '😮',
+                                                    'sad' => '😢',
+                                                    'angry' => '😠'
+                                                ];
+                                            @endphp
+                                            @foreach($reactionGroups as $type => $reactions)
+                                                <div class="flex items-center gap-2 bg-white dark:bg-gray-700 rounded-full px-4 py-2 border border-gray-200 dark:border-gray-600">
+                                                    <span class="text-2xl">{{ $emojis[$type] ?? '👍' }}</span>
+                                                    <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ $reactions->count() }}</span>
+                                                    <span class="text-xs text-gray-500 dark:text-gray-400">{{ ucfirst($type) }}</span>
+                                                </div>
+                                            @endforeach
+                                        </div>
+
+                                        <div class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                                            <strong class="text-gray-900 dark:text-white">{{ $post->reactions->count() }}</strong>
+                                            {{ Str::plural('person', $post->reactions->count()) }} reacted to this post
+                                        </div>
+
+                                        {{-- Login/Register CTA --}}
+                                        <div class="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                                            <div class="flex items-start gap-3">
+                                                <div class="flex-shrink-0">
+                                                    <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                    </svg>
+                                                </div>
+                                                <div class="flex-1">
+                                                    <p class="text-sm font-medium text-gray-900 dark:text-white mb-2">
+                                                        Want to react to this post?
+                                                    </p>
+                                                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                                                        Sign in to share your reaction and engage with the community.
+                                                    </p>
+                                                    <div class="flex gap-2">
+                                                        <a href="{{ route('login') }}" 
+                                                            class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors duration-200">
+                                                            Sign In
+                                                        </a>
+                                                        <a href="{{ route('register') }}" 
+                                                            class="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 text-sm font-medium rounded-lg border border-gray-300 dark:border-gray-600 transition-colors duration-200">
+                                                            Create Account
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
                             @endauth
                         </div>
 

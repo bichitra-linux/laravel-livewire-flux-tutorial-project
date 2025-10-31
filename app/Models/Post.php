@@ -10,8 +10,8 @@ use App\Enums\PostStatus;
 
 class Post extends Model
 {
-
     use HasFactory;
+    
     protected $fillable = [
         'title',
         'content',
@@ -39,29 +39,35 @@ class Post extends Model
         return $this->belongsToMany(Tag::class)->withTimestamps();
     }
 
-    public function reactions(){
+    public function reactions()
+    {
         return $this->hasMany(Reaction::class);
     }
 
-    // Get reaction counts grouped by type
+    // UPDATED: Better caching
     public function getReactionCountsAttribute()
     {
-        // Cache the result to avoid multiple queries
-        if (!isset($this->attributes['_reaction_counts_cache'])) {
-            $counts = $this->reactions()
-                ->selectRaw('type, COUNT(*) as count')
-                ->groupBy('type')
-                ->pluck('count', 'type');
-            
-            $this->attributes['_reaction_counts_cache'] = $counts;
+        // If reactions are already loaded, use them
+        if ($this->relationLoaded('reactions')) {
+            return $this->reactions->groupBy('type')->map->count();
         }
-        
-        return $this->attributes['_reaction_counts_cache'];
+
+        // Otherwise, query database
+        return $this->reactions()
+            ->selectRaw('type, COUNT(*) as count')
+            ->groupBy('type')
+            ->pluck('count', 'type');
     }
 
-    // Get total reactions count
+    // UPDATED: Better performance
     public function getTotalReactionsAttribute()
     {
+        // If reactions are already loaded, count them
+        if ($this->relationLoaded('reactions')) {
+            return $this->reactions->count();
+        }
+
+        // Otherwise, query database
         return $this->reactions()->count();
     }
 
@@ -69,6 +75,12 @@ class Post extends Model
     public function userReaction($userId = null)
     {
         $userId = $userId ?? auth()->id();
+        
+        // If reactions are loaded, find in collection
+        if ($this->relationLoaded('reactions')) {
+            return $this->reactions->firstWhere('user_id', $userId);
+        }
+        
         return $this->reactions()->where('user_id', $userId)->first();
     }
 
@@ -102,13 +114,11 @@ class Post extends Model
         return $query->orderBy('views', 'desc')->limit($limit);
     }
 
-    // Increment views
     public function incrementViews()
     {
         $this->increment('views');
     }
 
-    // Format views count (1.2K, 1.5M, etc.)
     public function getFormattedViewsAttribute()
     {
         if ($this->views >= 1000000) {
@@ -126,5 +136,3 @@ class Post extends Model
         ];
     }
 }
-
-

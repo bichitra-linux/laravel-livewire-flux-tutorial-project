@@ -6,7 +6,7 @@ use Livewire\Volt\Volt;
 use App\Livewire\SettingForm;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\publicPostController;
+use App\Http\Controllers\PublicPostController;
 use App\Http\Controllers\ReactionController;
 
 Route::get('/', function () {

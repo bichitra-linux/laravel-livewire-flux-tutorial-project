@@ -28,6 +28,7 @@ class Reaction extends Model
         return match($this->type){
             'like' => '👍',
             'love' => '❤️',
+            'care' => '🤗',
             'haha' => '😂',
             'wow' => '😮',
             'sad' => '😢',

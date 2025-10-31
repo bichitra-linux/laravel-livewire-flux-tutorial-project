@@ -14,7 +14,7 @@ class PublicPostController extends Controller
     //
     public function index(Request $request)
     {
-        $query = Post::with('user', 'category', 'tags')->where('status', PostStatus::Published);
+        $query = Post::with('user', 'category', 'tags', 'reactions')->where('status', PostStatus::Published);
 
         // Handle search (grouped to avoid interfering with other filters)
         if ($request->has('search') && $request->search) {
@@ -68,7 +68,7 @@ class PublicPostController extends Controller
 
     public function show($id)
     {
-        $post = Post::with('user', 'category', 'tags')
+        $post = Post::with('user', 'category', 'tags', 'reactions')
             ->where('status', PostStatus::Published)
             ->findOrFail($id);
 
@@ -81,7 +81,7 @@ class PublicPostController extends Controller
         }
 
         // Related posts (same category, exclude current)
-        $related = Post::with('user', 'category', 'tags')
+        $related = Post::with('user', 'category', 'tags', 'reactions')
             ->where('status', PostStatus::Published)
             ->where('id', '!=', $post->id)
             ->when($post->category, fn($q) => $q->where('category_id', $post->category->id))
@@ -90,8 +90,9 @@ class PublicPostController extends Controller
             ->get();
 
         // Popular posts (latest 5 published)
-        $popular = Post::where('status', PostStatus::Published)
-            ->latest()
+        $popular = Post::with('reactions')
+            ->where('status', PostStatus::Published)
+            ->orderBy('views', 'desc')
             ->take(5)
             ->get();
 

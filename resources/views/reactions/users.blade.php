@@ -1,4 +1,4 @@
-<x-layouts.app :title="'Reactions - ' . $post->title">
+<x-blog-header>
     <div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-12">
         <div class="max-w-3xl mx-auto px-6">
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
@@ -19,7 +19,7 @@
                     People who reacted to "{{ Str::limit($post->title, 50) }}"
                 </p>
 
-                {{-- Filter by Reaction Type (Optional) --}}
+                {{-- Filter by Reaction Type --}}
                 <div class="flex items-center gap-2 mb-6 overflow-x-auto pb-2">
                     <a href="{{ route('reactions.users', $post) }}" 
                         class="px-4 py-2 rounded-full text-sm font-medium transition-colors {{ !request('type') ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
@@ -31,7 +31,7 @@
                         @endphp
                         @if($count > 0)
                             <a href="{{ route('reactions.users', [$post, $reactionType]) }}" 
-                                class="px-4 py-2 rounded-full text-sm font-medium transition-colors flex items-center gap-1 {{ request()->segment(4) === $reactionType ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
+                                class="px-4 py-2 rounded-full text-sm font-medium transition-colors flex items-center gap-1 {{ $type === $reactionType ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
                                 <span class="text-lg">
                                     {{ match($reactionType) {
                                         'like' => '👍',
@@ -98,4 +98,5 @@
             </div>
         </div>
     </div>
-</x-layouts.app>
+</x-blog-header>
+<x-footer />

@@ -16,21 +16,21 @@ class UserController extends Controller
     {
         $query = User::query()->with('roles');
 
-        // Apply search filter
+        // Search filter
         if ($request->filled('search')) {
-            $search = $request->input('search');
+            $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
                     ->orWhere('email', 'like', "%{$search}%");
             });
         }
 
-        // Apply role filter
+        // Role filter
         if ($request->filled('role')) {
             $query->role($request->role);
         }
 
-        //Status Filter (email Verification)
+        // Status filter (email verification)
         if ($request->filled('status')) {
             if ($request->status === 'active') {
                 $query->whereNotNull('email_verified_at');
@@ -39,16 +39,20 @@ class UserController extends Controller
             }
         }
 
-        // Paginate results
+        // Get paginated users
         $users = $query->latest()->paginate(15)->withQueryString();
 
+        // Calculate statistics
         $stats = [
             'total' => User::count(),
             'active' => User::whereNotNull('email_verified_at')->count(),
-            'new_this_month' => User::whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->count(),
-            'admins' => User::role('admin')->count(),
+            'new_this_month' => User::whereMonth('created_at', now()->month)
+                ->whereYear('created_at', now()->year)
+                ->count(),
+            'admins' => User::role('admin')->count(), // ✅ This will now work
         ];
 
+        // Get all roles for filter dropdown
         $roles = Role::all();
 
         return view('users.index', compact('users', 'stats', 'roles'));
@@ -57,7 +61,8 @@ class UserController extends Controller
     /**
      * Display the Specific User.
      */
-    public function show(User $user){
+    public function show(User $user)
+    {
         $user->load('roles', 'posts', 'reactions');
 
         return view('users.show', compact('user'));
@@ -66,9 +71,10 @@ class UserController extends Controller
     /**
      * Delete a User.
      */
-    public function destroy(User $user){
+    public function destroy(User $user)
+    {
         // Prevent deleting self
-        if ($user->id === auth()->id()){
+        if ($user->id === auth()->id()) {
             return back()->with('error', 'You cannot delete your own account.');
         }
 

@@ -12,12 +12,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Seed in correct order
-        $this->call([
-            CategorySeeder::class,  // 1. Categories first
-            TagSeeder::class,       // 2. Tags second
-            PostSeeder::class,      // 3. Posts last (needs categories & tags)
-        ]);
 
         // Create test user if doesn't exist
         User::firstOrCreate(
@@ -28,6 +22,15 @@ class DatabaseSeeder extends Seeder
                 'email_verified_at' => now(),
             ]
         );
+        // Seed in correct order
+        $this->call([
+            RoleAndPermissionSeeder::class,
+            CategorySeeder::class,  // 1. Categories first
+            TagSeeder::class,       // 2. Tags second
+            PostSeeder::class,      // 3. Posts last (needs categories & tags)
+        ]);
+
+        
 
         $this->command->info('🎉 Database seeding completed successfully!');
     }

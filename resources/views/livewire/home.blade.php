@@ -181,20 +181,49 @@
                     </div>
 
                     <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
-                        <h3 class="font-bold text-lg text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                            <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                            </svg>
-                            Subscribe
-                        </h3>
-                        <form action="#" method="POST" class="space-y-4">
-                            <input type="email" name="email" placeholder="Your email" required 
-                                class="w-full px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200" />
-                            <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-3 rounded-lg font-semibold shadow-md transition-all duration-200">
-                                Subscribe
-                            </button>
-                        </form>
-                    </div>
+    <h3 class="font-bold text-lg text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+        <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+        </svg>
+        Subscribe
+    </h3>
+
+    {{-- Flash Messages --}}
+    @if(session('newsletter_success'))
+        <div class="mb-4 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+            <p class="text-sm text-green-800 dark:text-green-200">{{ session('newsletter_success') }}</p>
+        </div>
+    @endif
+
+    @if(session('newsletter_error'))
+        <div class="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+            <p class="text-sm text-red-800 dark:text-red-200">{{ session('newsletter_error') }}</p>
+        </div>
+    @endif
+
+    @if(session('newsletter_info'))
+        <div class="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+            <p class="text-sm text-blue-800 dark:text-blue-200">{{ session('newsletter_info') }}</p>
+        </div>
+    @endif
+
+    <form action="{{ route('newsletter.subscribe') }}" method="POST" class="space-y-4">
+        @csrf
+        <input 
+            type="email" 
+            name="email" 
+            placeholder="Your email" 
+            required 
+            value="{{ old('email') }}"
+            class="w-full px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 @error('email') border-red-500 @enderror" />
+        @error('email')
+            <p class="text-xs text-red-600 dark:text-red-400">{{ $message }}</p>
+        @enderror
+        <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-3 rounded-lg font-semibold shadow-md transition-all duration-200">
+            Subscribe
+        </button>
+    </form>
+</div>
                 </aside>
             </div>
 

@@ -84,11 +84,17 @@
                 <label for="content" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Content <span class="text-red-500">*</span>
                 </label>
-                <textarea id="content" name="content" rows="10" required
-                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white @error('content') @enderror">{{ old('content') }}</textarea>
+                <input id="content" type="hidden" name="content" value="{{ old('content') }}">
+                <trix-editor 
+                    input="content" 
+                    class="trix-content border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white @error('content') @enderror"
+                    placeholder="Write your post content here..."></trix-editor>
                 @error('content')
                     <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                 @enderror
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Use the toolbar above to format your text with <strong>bold</strong>, <em>italic</em>, lists, links, and more.
+                </p>
             </div>
 
             {{-- Status --}}
@@ -123,6 +129,71 @@
         </form>
     </div>
 
+    @push('styles')
+    <style>
+        /* Trix Editor Dark Mode & Custom Styling */
+        trix-toolbar {
+            background: white;
+            border-radius: 0.375rem 0.375rem 0 0;
+            border: 1px solid #d1d5db;
+            border-bottom: none;
+        }
+
+        .dark trix-toolbar {
+            background: #374151;
+            border-color: #4b5563;
+        }
+
+        trix-editor {
+            min-height: 300px;
+            max-height: 600px;
+            overflow-y: auto;
+            padding: 1rem;
+            background: white;
+            border-radius: 0 0 0.375rem 0.375rem;
+        }
+
+        .dark trix-editor {
+            background: #374151;
+            color: white;
+        }
+
+        /* Toolbar buttons dark mode */
+        .dark trix-button-group button {
+            color: white;
+        }
+
+        .dark trix-button-group button:hover {
+            background: #4b5563;
+        }
+
+        .dark trix-button--icon::before {
+            filter: invert(1);
+        }
+
+        /* Active button state */
+        trix-toolbar .trix-button.trix-active {
+            background: #dbeafe;
+        }
+
+        .dark trix-toolbar .trix-button.trix-active {
+            background: #1e3a8a;
+        }
+
+        /* File attachment styling */
+        trix-editor .attachment {
+            padding: 0.5rem;
+            margin: 0.5rem 0;
+            background: #f3f4f6;
+            border-radius: 0.375rem;
+        }
+
+        .dark trix-editor .attachment {
+            background: #1f2937;
+        }
+    </style>
+    @endpush
+
     @push('scripts')
     <script>
         // Image preview
@@ -141,6 +212,12 @@
             } else {
                 preview.classList.add('hidden');
             }
+        });
+
+        // Disable file attachments in Trix
+        document.addEventListener("trix-file-accept", function(e) {
+            e.preventDefault();
+            alert("File attachments are disabled. Please use the Featured Image field above.");
         });
     </script>
     @endpush

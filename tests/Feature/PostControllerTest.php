@@ -13,12 +13,14 @@ it('allows authenticated user to create a post', function () {
     $response = $this->post(route('posts.store'), [
         'title' => 'New Post',
         'content' => 'Post content',
+        'status' => 'draft',
     ]);
 
     $response->assertRedirect(route('posts.index'));
     $this->assertDatabaseHas('posts', [
         'title' => 'New Post',
         'user_id' => $user->id,
+        'status' => 'draft',
     ]);
 });
 

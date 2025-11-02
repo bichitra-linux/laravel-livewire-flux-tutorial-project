@@ -30,7 +30,7 @@ Route::middleware(['auth'])->group(function () {
 Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
 Route::get('/newsletter/unsubscribe/{token}', [NewsletterController::class, 'unsubscribe'])->name('newsletter.unsubscribe');
 
-// ✅ ADMIN ROUTES - All grouped under /admin prefix with auth middleware
+// ADMIN ROUTES
 Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -42,7 +42,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
     Route::get('/newsletter', [NewsletterController::class, 'index'])->name('newsletter.index');
     Route::get('/newsletter/export', [NewsletterController::class, 'export'])->name('newsletter.export');
     
-    // ✅ Users Management - Now properly in /admin namespace
+    // Users Management 
     Route::resource('users', UserController::class)->only(['index', 'show', 'destroy']);
 
     // Notifications Management

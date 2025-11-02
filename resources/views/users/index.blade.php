@@ -14,7 +14,7 @@
         @endif
 
         {{-- Header Section --}}
-        <div class="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl p-6 shadow-lg text-white">
+        <div class="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-lg dark:text-white">
             <div class="flex items-center justify-between">
                 <div>
                     <h1 class="text-3xl font-bold flex items-center gap-3">
@@ -36,7 +36,7 @@
         {{-- Stats Cards --}}
         <div class="grid gap-4 md:grid-cols-4">
             {{-- Total Users --}}
-            <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-200">
+            <div class="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-200">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Users</p>
@@ -52,7 +52,7 @@
             </div>
 
             {{-- Active Users --}}
-            <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-200">
+            <div class="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-200">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Active</p>
@@ -70,7 +70,7 @@
             </div>
 
             {{-- New This Month --}}
-            <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-200">
+            <div class="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-200">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600 dark:text-gray-400">New This Month</p>
@@ -86,7 +86,7 @@
             </div>
 
             {{-- Admins --}}
-            <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-200">
+            <div class="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-200">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Administrators</p>
@@ -103,7 +103,7 @@
         </div>
 
         {{-- Search and Filters --}}
-        <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
+        <div class="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-lg">
             <form method="GET" action="{{ route('users.index') }}" class="flex flex-col md:flex-row gap-4 items-center justify-between">
                 {{-- Search Bar --}}
                 <div class="flex-1 w-full md:max-w-md">
@@ -153,7 +153,7 @@
         </div>
 
         {{-- Users Table --}}
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+        <div class="bg-white dark:bg-zinc-800 rounded-xl shadow-lg overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                     <thead class="bg-gray-50 dark:bg-gray-900">
@@ -181,7 +181,7 @@
                             </th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                    <tbody class="bg-white dark:bg-zinc-800 divide-y divide-gray-200 dark:divide-gray-700">
                         @forelse($users as $user)
                             <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors {{ $user->email_verified_at ? '' : 'opacity-60' }}">
                                 <td class="px-6 py-4 whitespace-nowrap">

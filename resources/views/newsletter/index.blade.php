@@ -1,7 +1,7 @@
 <x-layouts.app :title="'Newsletter'">
     <div class="flex h-full w-full flex-1 flex-col gap-6 rounded-xl p-6">
         {{-- Header Section --}}
-        <div class="bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl p-6 shadow-lg text-white">
+        <div class="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-lg dark:text-white">
             <div class="flex items-center justify-between">
                 <div>
                     <h1 class="text-3xl font-bold flex items-center gap-3">
@@ -27,7 +27,7 @@
         {{-- Stats Cards --}}
         <div class="grid gap-4 md:grid-cols-4">
             {{-- Total Subscribers --}}
-            <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-200">
+            <div class="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-200">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Subscribers</p>
@@ -43,7 +43,7 @@
             </div>
 
             {{-- Active Subscribers --}}
-            <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-200">
+            <div class="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-200">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Active</p>
@@ -61,7 +61,7 @@
             </div>
 
             {{-- Unsubscribed --}}
-            <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-200">
+            <div class="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-200">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Unsubscribed</p>
@@ -77,7 +77,7 @@
             </div>
 
             {{-- New Today --}}
-            <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-200">
+            <div class="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-200">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600 dark:text-gray-400">New Today</p>
@@ -94,7 +94,7 @@
         </div>
 
         {{-- Subscribers Table --}}
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+        <div class="bg-white dark:bg-zinc-800 rounded-xl shadow-lg overflow-hidden">
             <div class="p-6">
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -117,7 +117,7 @@
                                 </th>
                             </tr>
                         </thead>
-                        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                        <tbody class="bg-white dark:bg-zinc-800 divide-y divide-gray-200 dark:divide-gray-700">
                             @forelse($subscribers as $subscriber)
                                 <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                                     <td class="px-6 py-4 whitespace-nowrap">
@@ -197,7 +197,7 @@
     </div>
 
     {{-- Details Modal --}}
-    <div id="detailsModal" class="hidden fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity overflow-y-auto h-full w-full z-50">
+    <div id="detailsModal" class="hidden fixed inset-0 bg-zinc-900/60 backdrop-blur-sm transition-opacity overflow-y-auto h-full w-full z-50">
         <div class="relative top-20 mx-auto p-5 border w-full max-w-lg shadow-2xl rounded-xl bg-white dark:bg-gray-800">
             <div class="mt-3">
                 {{-- Modal Header --}}

@@ -25,10 +25,15 @@ class PostObserver
     public function created(Post $post): void
     {
         Log::info('Post created successfully: ' . $post->title . ' by ' . ($post->user->name ?? 'Unknown'));
-        
+
         // Notify the author
         if ($post->user) {
             $post->user->notify(new PostCreated($post));
+        }
+
+        if ($post->status === PostStatus::Published) {
+            Log::info('Post created with Published status, notifying subscribers...');
+            $this->notifySubscribersAboutNewPost($post);
         }
     }
 
@@ -40,14 +45,15 @@ class PostObserver
     public function updated(Post $post): void
     {
         Log::info('Post updated successfully: ' . $post->title);
-        
+
         // Notify the author
         if ($post->user) {
             $post->user->notify(new PostUpdated($post));
         }
-        
+
         // If status changed to Published, notify subscribers
         if ($post->isDirty('status') && $post->status === PostStatus::Published) {
+            Log::info('Post status changed to Published, notifying subscribers...');
             $this->notifySubscribersAboutNewPost($post);
         }
     }
@@ -60,7 +66,7 @@ class PostObserver
     public function deleted(Post $post): void
     {
         Log::info('Post deleted successfully: ' . $post->title);
-        
+
         // Notify the author
         if ($post->user) {
             $post->user->notify(new PostDeleted($post->title));
@@ -83,10 +89,18 @@ class PostObserver
     protected function notifySubscribersAboutNewPost(Post $post): void
     {
         $subscribers = NewsletterSubscriber::where('is_subscribed', true)->get();
-        
+        Log::info('Found ' . $subscribers->count() . ' active subscribers');
+
         if ($subscribers->count() > 0) {
-            Notification::send($subscribers, new PostPublished($post));
-            Log::info('Newsletter subscribers notified about post: ' . $post->title . ' (Total: ' . $subscribers->count() . ')');
+            try {
+                Notification::send($subscribers, new PostPublished($post));
+                Log::info('Newsletter subscribers notified about post: ' . $post->title . ' (Total: ' . $subscribers->count() . ')');
+            } catch (\Exception $e) {
+                Log::error('Error notifying subscribers about post: ' . $post->title . ' - ' . $e->getMessage());
+            }
+
+        } else {
+            Log::info('No active subscribers to notify.');
         }
     }
 }

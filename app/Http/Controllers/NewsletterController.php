@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\NewsletterSubscriber;
+use App\Notifications\NewsletterWelcome;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class NewsletterController extends Controller
@@ -40,12 +42,19 @@ class NewsletterController extends Controller
                         'user_agent' => $request->userAgent(),
                         'name' => $request->name ?? $subscriber->name,
                     ]);
+
+                    $subscriber->refresh();
+
+
+                    $subscriber->notify(new NewsletterWelcome());
+                    Log::info('Newsletter re-subscription: ' . $subscriber->email);
+
                     return back()->with('newsletter_success', 'You have been re-subscribed to the newsletter.');
                 }
             }
 
             //New subscription
-            NewsletterSubscriber::create([
+            $subscriber = NewsletterSubscriber::create([
                 'email' => $request->email,
                 'name' => $request->name,
                 'ip_address' => $request->ip(),
@@ -54,8 +63,14 @@ class NewsletterController extends Controller
                 'subscribed_at' => now(),
             ]);
 
+            $subscriber->notify(new NewsletterWelcome());
+
+            Log::info('Newsletter subscription: ' . $subscriber->email);
+
             return back()->with('newsletter_success', 'Thank you for subscribing to our newsletter!');
         } catch (\Exception $e){
+
+            Log::error('Newsletter subscription error: ' . $e->getMessage());
             return back()->with('newsletter_error', 'An error occurred while processing your subscription. Please try again later.');
         }
     }
@@ -66,11 +81,15 @@ class NewsletterController extends Controller
     public function unsubscribe($token){
         $subscriber = NewsletterSubscriber::where('token', $token)->firstOrFail();
 
+        $subscriber->refresh();
+
         if (!$subscriber->is_subscribed){
             return view('newsletter.already-unsubscribed', compact('subscriber'));
         }
 
         $subscriber->unsubscribe();
+
+        $subscriber->refresh();
         return view('newsletter.unsubscribed', compact('subscriber'));
     }
 

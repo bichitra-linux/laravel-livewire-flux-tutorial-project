@@ -5,11 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Str;
+use Illuminate\Notifications\Notifiable;
 
 class NewsletterSubscriber extends Model
 {
     //
-    use HasFactory;
+    use HasFactory, Notifiable;
 
     protected $fillable =[
         'email',
@@ -58,5 +59,9 @@ class NewsletterSubscriber extends Model
             'is_subscribed' => false,
             'unsubscribed_at' => now(),
         ]);
+    }
+
+    public function routeNotificationForMail(){
+        return $this->email;
     }
 }

@@ -105,6 +105,12 @@ class PostController extends Controller
             $post->tags()->sync($tagIds);
         }
 
+        session()->flash('toast', [
+            'variant' => 'success',
+            'heading' => 'Post created successfully',
+            'text' => 'Your post "' . $post->title . '" has been created',
+        ]);
+
         return redirect()->route('posts.index')->with('success', 'Post created successfully.');
     }
 
@@ -227,6 +233,12 @@ class PostController extends Controller
             $post->tags()->detach();
         }
 
+        session()->flash('toast', [
+            'variant' => 'success',
+            'heading' => 'Post updated successfully',
+            'text' => 'Your post has been updated',
+        ]);
+
         return redirect()->route('posts.index')->with('success', 'Post updated successfully.');
     }
 
@@ -243,6 +255,11 @@ class PostController extends Controller
         }
 
         $post->delete();
+
+        session()->flash('toast', [
+            'variant' => 'success',
+            'heading' => 'Post deleted successfully',
+        ]);
 
         return redirect()->route('posts.index')->with('success', 'Post deleted successfully.');
     }

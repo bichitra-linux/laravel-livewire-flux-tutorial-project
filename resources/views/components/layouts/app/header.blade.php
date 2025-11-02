@@ -23,6 +23,13 @@
                 <flux:tooltip :content="__('Search')" position="bottom">
                     <flux:navbar.item class="!h-10 [&>div>svg]:size-5" icon="magnifying-glass" href="#" :label="__('Search')" />
                 </flux:tooltip>
+
+                {{-- Notification Bell --}}
+                @auth
+                    <div class="flex items-center h-10">
+                        <x-notification-bell />
+                    </div>
+                @endauth
                 <flux:tooltip :content="__('Repository')" position="bottom">
                     <flux:navbar.item
                         class="h-10 max-lg:hidden [&>div>svg]:size-5"
@@ -127,6 +134,15 @@
         <div class="flex-grow">
             {{ $slot }}
         </div>
+
+        {{-- Toast Notifications --}}
+        @if(session('toast'))
+            <x-toast 
+                :variant="session('toast.variant', 'info')" 
+                :heading="session('toast.heading')" 
+                :text="session('toast.text', '')"
+            />
+        @endif
 
 
         <livewire:footer />

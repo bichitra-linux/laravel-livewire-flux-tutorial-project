@@ -32,7 +32,17 @@
                 </flux:navlist.item>
             </flux:navlist>
 
+           
+
             @auth
+
+            {{-- Notification Bell --}}
+            <div class="px-4 py-2 border-t border-zinc-200 dark:border-zinc-700">
+                <div class="flex items-center justify-between">
+                    <span class="text-sm font-medium text-zinc-700 dark:text-zinc-300">Notifications</span>
+                    <x-notification-bell />
+                </div>
+            </div>
 
             <!-- Desktop User Menu -->
             <flux:dropdown class="hidden lg:block" position="bottom" align="start">
@@ -138,6 +148,15 @@
         @endauth
 
         {{ $slot }}
+
+        {{-- Toast Notifications --}}
+        @if(session('toast'))
+            <x-toast 
+                :variant="session('toast.variant', 'info')" 
+                :heading="session('toast.heading')" 
+                :text="session('toast.text', '')"
+            />
+        @endif
 
         {{-- Trix Editor JS - Add this BEFORE @fluxScripts --}}
         <script src="https://unpkg.com/trix@2.0.8/dist/trix.umd.min.js"></script>

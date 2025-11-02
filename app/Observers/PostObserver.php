@@ -4,17 +4,19 @@ namespace App\Observers;
 
 use App\Models\Post;
 use App\Enums\PostStatus;
+use App\Notifications\PostCreated;
+use App\Notifications\PostUpdated;
+use App\Notifications\PostDeleted;
+use App\Notifications\PostPublished;
+use App\Models\NewsletterSubscriber;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
 
 class PostObserver
 {
-    /**
-     * Handle the Post "created" event.
-     */
     public function creating(Post $post): void
     {
-        //
-        if(!$post->status){
+        if (!$post->status) {
             $post->status = PostStatus::Draft;
         }
         Log::info('Post is being created: ' . $post->title);
@@ -22,57 +24,69 @@ class PostObserver
 
     public function created(Post $post): void
     {
-        //
         Log::info('Post created successfully: ' . $post->title . ' by ' . ($post->user->name ?? 'Unknown'));
+        
+        // Notify the author
+        if ($post->user) {
+            $post->user->notify(new PostCreated($post));
+        }
     }
 
     public function updating(Post $post): void
     {
-        //
         Log::info('Post is being updated: ' . $post->title);
     }
 
-    /**
-     * Handle the Post "updated" event.
-     */
     public function updated(Post $post): void
     {
-        //
         Log::info('Post updated successfully: ' . $post->title);
+        
+        // Notify the author
+        if ($post->user) {
+            $post->user->notify(new PostUpdated($post));
+        }
+        
+        // If status changed to Published, notify subscribers
+        if ($post->isDirty('status') && $post->status === PostStatus::Published) {
+            $this->notifySubscribersAboutNewPost($post);
+        }
     }
 
     public function deleting(Post $post): void
     {
-        //
         Log::info('Post is being deleted: ' . $post->title);
     }
 
-    /**
-     * Handle the Post "deleted" event.
-     */
     public function deleted(Post $post): void
     {
-        //
         Log::info('Post deleted successfully: ' . $post->title);
+        
+        // Notify the author
+        if ($post->user) {
+            $post->user->notify(new PostDeleted($post->title));
+        }
     }
 
-    
-
-    /**
-     * Handle the Post "restored" event.
-     */
     public function restored(Post $post): void
     {
-        //
         Log::info('Post restored successfully: ' . $post->title);
     }
 
-    /**
-     * Handle the Post "force deleted" event.
-     */
     public function forceDeleted(Post $post): void
     {
-        //
         Log::info('Post force deleted: ' . $post->title);
+    }
+
+    /**
+     * Notify newsletter subscribers about newly published post
+     */
+    protected function notifySubscribersAboutNewPost(Post $post): void
+    {
+        $subscribers = NewsletterSubscriber::where('is_subscribed', true)->get();
+        
+        if ($subscribers->count() > 0) {
+            Notification::send($subscribers, new PostPublished($post));
+            Log::info('Newsletter subscribers notified about post: ' . $post->title . ' (Total: ' . $subscribers->count() . ')');
+        }
     }
 }

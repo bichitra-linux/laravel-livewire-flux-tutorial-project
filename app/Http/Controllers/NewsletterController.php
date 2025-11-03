@@ -47,9 +47,10 @@ class NewsletterController extends Controller
 
 
                     $subscriber->notify(new NewsletterWelcome());
-                    Log::info('Newsletter re-subscription: ' . $subscriber->email);
+                    Log::info('Newsletter re-subscription successful: ' . $subscriber->email);
 
-                    return back()->with('newsletter_success', 'You have been re-subscribed to the newsletter.');
+                    // ← FIX: Redirect to HOME instead of back to unsubscribe page
+                    return redirect()->route('home')->with('newsletter_success', 'Welcome back! You have been re-subscribed to our newsletter. Check your email!');
                 }
             }
 

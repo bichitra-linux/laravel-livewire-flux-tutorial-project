@@ -59,6 +59,9 @@ Route::get('/settings-form', SettingForm::class)->middleware(['auth']);
 
 // About page
 Route::view('about', 'about')->name('about');
+// Terms of Service and Privacy Policy pages
+Route::view('terms', 'terms-of-service.index')->name('terms');
+Route::view('privacy', 'privacy-policy.index')->name('privacy');
 
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');

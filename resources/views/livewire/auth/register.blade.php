@@ -50,6 +50,30 @@
                 viewable
             />
 
+            <div class="flex items-start gap-2">
+                <input 
+                    type="checkbox" 
+                    name="terms" 
+                    id="terms" 
+                    required
+                    class="mt-1 h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 dark:bg-gray-700"
+                >
+                <label for="terms" class="text-sm text-gray-600 dark:text-gray-400">
+                    I agree to the 
+                    <a href="{{ route('terms') }}" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">
+                        Terms of Service
+                    </a>
+                    and 
+                    <a href="{{ route('privacy') }}" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">
+                        Privacy Policy
+                    </a>
+                    <span class="text-red-500">*</span>
+                </label>
+            </div>
+            @error('terms')
+                <p class="text-red-500 text-xs -mt-4">{{ $message }}</p>
+            @enderror
+
             <div class="flex items-center justify-end">
                 <flux:button type="submit" variant="primary" class="w-full" data-test="register-user-button">
                     {{ __('Create account') }}

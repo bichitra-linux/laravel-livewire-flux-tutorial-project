@@ -13,6 +13,7 @@ class PostCreated extends Notification
     public function __construct(public Post $post)
     {
         //
+        $this->delay(now()->addSeconds(10));
     }
 
     public function via(object $notifiable): array

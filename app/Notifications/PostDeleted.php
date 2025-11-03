@@ -12,6 +12,7 @@ class PostDeleted extends Notification
     public function __construct(public string $postTitle)
     {
         //
+        $this->delay(now()->addSeconds(10));
     }
 
     public function via(object $notifiable): array

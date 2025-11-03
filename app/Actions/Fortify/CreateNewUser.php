@@ -3,6 +3,7 @@
 namespace App\Actions\Fortify;
 
 use App\Models\User;
+use App\Notifications\WelcomeEmail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
@@ -28,12 +29,21 @@ class CreateNewUser implements CreatesNewUsers
                 Rule::unique(User::class),
             ],
             'password' => $this->passwordRules(),
+            'terms' => ['accepted'],
+        ],[
+            'terms.accepted' => 'You must accept the Terms of Service and Privacy Policy to register.',
         ])->validate();
 
-        return User::create([
+        $user = User::create([
             'name' => $input['name'],
             'email' => $input['email'],
             'password' => $input['password'],
         ]);
+
+        $user->assignRole('user');
+
+        $user->notify(new WelcomeEmail());
+
+        return $user;
     }
 }

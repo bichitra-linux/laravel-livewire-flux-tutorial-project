@@ -17,6 +17,7 @@ class NewsletterWelcome extends Notification implements ShouldQueue
     public function __construct()
     {
         //
+        $this->delay(now()->addSeconds(10));
     }
 
     /**

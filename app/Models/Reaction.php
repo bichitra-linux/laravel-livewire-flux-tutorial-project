@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\ReactionType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -16,37 +17,44 @@ class Reaction extends Model
         'type',
     ];
 
-    public function user(){
+    /**
+     * Get the reaction type as an enum.
+     */
+
+    protected function casts(): array{
+        return [
+            'type' => ReactionType::class,
+        ];
+    }
+
+
+    public function user()
+    {
         return $this->belongsTo(User::class);
     }
 
-    public function post(){
+    public function post()
+    {
         return $this->belongsTo(Post::class);
     }
 
-    public function getEmojiAttribute(){
-        return match($this->type){
-            'like' => '👍',
-            'love' => '❤️',
-            'care' => '🤗',
-            'haha' => '😂',
-            'wow' => '😮',
-            'sad' => '😢',
-            'angry' => '😠',
-            default => '👍',
-        };
+    public function getEmojiAttribute(): string
+    {
+        return $this->type->emoji();
     }
 
-    public function getColorAttribute(){
-        return match($this->type) {
-            'like' => 'text-blue-500',
-            'love' => 'text-red-500',
-            'care' => 'text-yellow-500',
-            'haha' => 'text-yellow-400',
-            'wow' => 'text-purple-500',
-            'sad' => 'text-gray-500',
-            'angry' => 'text-orange-500',
-            default => 'text-blue-500',
-        };
+    public function getColorAttribute(): string
+    {
+        return $this->type->color();
+    }
+
+
+    public function scopeOfType($query, ReactionType $type)
+    {
+
+        if($type instanceof ReactionType){
+            return $query->where('type', $type->value);
+        }
+        return $query->where('type', $type);
     }
 }

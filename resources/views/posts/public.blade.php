@@ -129,59 +129,20 @@
                                 {{-- ✅ UPDATED: Reaction Display Based on Auth Status --}}
                                 @if($post->reactions->count() > 0)
                                     <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                                        @auth
-                                            {{-- Authenticated: Show interactive reactions --}}
-                                            <x-post-reactions :post="$post" />
-                                        @else
-                                            {{-- Unauthenticated: Show read-only reaction counts --}}
-                                            <div class="flex items-center justify-between">
-                                                <div class="flex items-center gap-2">
-                                                    {{-- Reaction emoji bubbles --}}
-                                                    <div class="flex -space-x-2">
-                                                        @php
-                                                            $reactionGroups = $post->reactions->groupBy('type');
-                                                            $emojis = [
-                                                                'like' => '👍',
-                                                                'love' => '❤️',
-                                                                'care' => '🤗',
-                                                                'haha' => '😂',
-                                                                'wow' => '😮',
-                                                                'sad' => '😢',
-                                                                'angry' => '😠'
-                                                            ];
-                                                        @endphp
-                                                        @foreach($reactionGroups->take(5) as $type => $reactions)
-                                                            <div class="w-8 h-8 rounded-full bg-white dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 flex items-center justify-center text-lg" 
-                                                                title="{{ ucfirst($type) }}: {{ $reactions->count() }}">
-                                                                {{ $emojis[$type] ?? '👍' }}
-                                                            </div>
-                                                        @endforeach
-                                                    </div>
-                                                    
-                                                    {{-- Total count --}}
-                                                    <span class="text-sm text-gray-600 dark:text-gray-400 font-medium">
-                                                        {{ $post->reactions->count() }} {{ Str::plural('reaction', $post->reactions->count()) }}
-                                                    </span>
-                                                </div>
-                                                
-                                                {{-- Login prompt --}}
-                                                <a href="{{ route('login') }}" 
-                                                    class="text-xs text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">
-                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
-                                                    </svg>
-                                                    Login to react
-                                                </a>
-                                            </div>
-                                        @endauth
-                                    </div>
-                                @else
-                                    {{-- No reactions yet - Only show for authenticated users --}}
-                                    @auth
-                                        <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                                            <x-post-reactions :post="$post" />
+                                        <div class="flex items-center justify-between">
+                                            {{-- Compact reaction display --}}
+                                            <x-post-reactions :post="$post" :compact="true" />
+                                            
+                                            {{-- View detail link --}}
+                                            <a href="{{ route('public.posts.show', $post) }}" 
+                                                class="text-xs font-medium text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">
+                                                React
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                                </svg>
+                                            </a>
                                         </div>
-                                    @endauth
+                                    </div>
                                 @endif
                             </div>
                         </article>

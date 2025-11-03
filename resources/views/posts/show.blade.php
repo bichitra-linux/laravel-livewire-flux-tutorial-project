@@ -78,87 +78,95 @@
                         {{-- ✨ MOVE REACTIONS HERE (After Content) ✨ --}}
                         <div class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
                             @auth
-                                {{-- Authenticated: Always show interactive reactions --}}
-                                <x-post-reactions :post="$post" />
+                                {{-- ✅ Authenticated: Show FULL interactive reactions --}}
+                                <x-post-reactions :post="$post" :compact="false" />
                             @else
-                                {{-- Unauthenticated: Show read-only if reactions exist --}}
+                                {{-- ✅ Unauthenticated: Show read-only with login CTA --}}
                                 @if($post->reactions->count() > 0)
-                                    <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-6">
-                                        <h3
-                                            class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                                            <svg class="w-5 h-5 text-pink-500" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
-                                                </path>
+                                    <div class="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-6 border border-gray-200 dark:border-gray-700">
+                                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                                            <svg class="w-5 h-5 text-pink-500" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"></path>
                                             </svg>
-                                            Reactions
+                                            Reactions to this post
                                         </h3>
 
-                                        {{-- Reaction breakdown --}}
-                                        <div class="flex flex-wrap gap-3 mb-4">
+                                        {{-- Reaction Grid --}}
+                                        <div class="grid grid-cols-7 gap-3 mb-6">
                                             @php
-                                                $reactionGroups = $post->reactions->groupBy('type');
+                                                $reactionCounts = $post->reaction_counts;
                                                 $emojis = [
-                                                    'like' => '👍',
-                                                    'love' => '❤️',
-                                                    'care' => '🤗',
-                                                    'haha' => '😂',
-                                                    'wow' => '😮',
-                                                    'sad' => '😢',
-                                                    'angry' => '😠'
+                                                    'like' => '👍', 'love' => '❤️', 'care' => '🤗',
+                                                    'haha' => '😂', 'wow' => '😮', 'sad' => '😢', 'angry' => '😠'
                                                 ];
                                             @endphp
-                                            @foreach($reactionGroups as $type => $reactions)
-                                                <div
-                                                    class="flex items-center gap-2 bg-white dark:bg-gray-700 rounded-full px-4 py-2 border border-gray-200 dark:border-gray-600">
-                                                    <span class="text-2xl">{{ $emojis[$type] ?? '👍' }}</span>
-                                                    <span
-                                                        class="text-sm font-semibold text-gray-900 dark:text-white">{{ $reactions->count() }}</span>
-                                                    <span
-                                                        class="text-xs text-gray-500 dark:text-gray-400">{{ ucfirst($type) }}</span>
+                                            @foreach(['like', 'love', 'care', 'haha', 'wow', 'sad', 'angry'] as $type)
+                                                <div class="flex flex-col items-center p-3 rounded-xl bg-white dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 {{ isset($reactionCounts[$type]) && $reactionCounts[$type] > 0 ? 'ring-2 ring-blue-300 dark:ring-blue-600' : 'opacity-50' }}">
+                                                    <span class="text-3xl mb-1">{{ $emojis[$type] }}</span>
+                                                    <span class="text-sm font-bold text-gray-900 dark:text-white">
+                                                        {{ $reactionCounts[$type] ?? 0 }}
+                                                    </span>
+                                                    <span class="text-xs text-gray-500 dark:text-gray-400 capitalize">
+                                                        {{ $type }}
+                                                    </span>
                                                 </div>
                                             @endforeach
                                         </div>
 
-                                        <div class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                                            <strong
-                                                class="text-gray-900 dark:text-white">{{ $post->reactions->count() }}</strong>
-                                            {{ Str::plural('person', $post->reactions->count()) }} reacted to this post
+                                        <div class="text-center mb-4">
+                                            <p class="text-sm text-gray-600 dark:text-gray-400">
+                                                <strong class="text-gray-900 dark:text-white">{{ $post->total_reactions }}</strong>
+                                                {{ Str::plural('person', $post->total_reactions) }} reacted to this post
+                                            </p>
                                         </div>
 
-                                        {{-- Login/Register CTA --}}
-                                        <div
-                                            class="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                                        {{-- ✅ Login CTA --}}
+                                        <div class="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-2 border-blue-200 dark:border-blue-800 rounded-xl">
                                             <div class="flex items-start gap-3">
                                                 <div class="flex-shrink-0">
-                                                    <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none"
-                                                        stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
-                                                        </path>
+                                                    <svg class="w-8 h-8 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
                                                     </svg>
                                                 </div>
                                                 <div class="flex-1">
-                                                    <p class="text-sm font-medium text-gray-900 dark:text-white mb-2">
-                                                        Want to react to this post?
-                                                    </p>
+                                                    <h4 class="text-base font-bold text-gray-900 dark:text-white mb-1">
+                                                        Love this post?
+                                                    </h4>
                                                     <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                                                        Sign in to share your reaction and engage with the community.
+                                                        Sign in to share your reaction and see what others think!
                                                     </p>
                                                     <div class="flex gap-2">
                                                         <a href="{{ route('login') }}"
-                                                            class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors duration-200">
+                                                            class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-200">
+                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
+                                                            </svg>
                                                             Sign In
                                                         </a>
                                                         <a href="{{ route('register') }}"
-                                                            class="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 text-sm font-medium rounded-lg border border-gray-300 dark:border-gray-600 transition-colors duration-200">
+                                                            class="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 text-sm font-semibold rounded-lg border-2 border-gray-300 dark:border-gray-600 shadow-sm hover:shadow-md transition-all duration-200">
+                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+                                                            </svg>
                                                             Create Account
                                                         </a>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
+                                    </div>
+                                @else
+                                    {{-- No reactions yet --}}
+                                    <div class="text-center p-8 bg-gray-50 dark:bg-gray-800 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600">
+                                        <svg class="w-16 h-16 mx-auto text-gray-400 dark:text-gray-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                                        </svg>
+                                        <p class="text-gray-600 dark:text-gray-400 mb-4">
+                                            Be the first to react to this post!
+                                        </p>
+                                        <a href="{{ route('login') }}" class="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-200">
+                                            Sign In to React
+                                        </a>
                                     </div>
                                 @endif
                             @endauth

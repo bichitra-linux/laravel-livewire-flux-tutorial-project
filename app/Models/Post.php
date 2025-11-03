@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use App\Enums\PostStatus;
 
@@ -47,28 +48,30 @@ class Post extends Model
     // UPDATED: Better caching
     public function getReactionCountsAttribute()
     {
-        // If reactions are already loaded, use them
-        if ($this->relationLoaded('reactions')) {
+       return Cache::remember("post.{$this->id}.reaction_counts", now()->addMinutes(5), function () {
+        if ($this->relationLoaded('reactions')){
             return $this->reactions->groupBy('type')->map->count();
         }
-
-        // Otherwise, query database
-        return $this->reactions()
-            ->selectRaw('type, COUNT(*) as count')
-            ->groupBy('type')
-            ->pluck('count', 'type');
+        
+        return $this->reactions()->selectRaw('type, COUNT(*) as count')
+           ->groupBy('type')
+           ->pluck('count', 'type');
+       });
     }
 
     // UPDATED: Better performance
     public function getTotalReactionsAttribute()
     {
-        // If reactions are already loaded, count them
-        if ($this->relationLoaded('reactions')) {
-            return $this->reactions->count();
-        }
-
-        // Otherwise, query database
-        return $this->reactions()->count();
+        return Cache::remember(
+            "post.{$this->id}.total_reactions",
+            now()->addMinutes(5),
+            function() {
+                if ($this->relationLoaded('reactions')) {
+                    return $this->reactions->count();
+                }
+                return $this->reactions()->count();
+            }
+        );
     }
 
     // Check if user has reacted to this post
@@ -134,5 +137,42 @@ class Post extends Model
         return [
             'status' => PostStatus::class,
         ];
+    }
+
+    protected static function booted(){
+        static::updated(function ($post){
+
+            $post->clearReactionCache();
+        });
+
+        static::deleted(function ($post) {
+
+            $post->clearReactionCache();
+        });
+    }
+
+
+    public function clearReactionCache(){
+        Cache::forget("post.{$this->id}.reaction_counts");
+        Cache::forget("post.{$this->id}.total_reactions");
+    }
+
+    public function getMostPopularReactionAttribute(): ?string{
+
+        $mostPopular = $this->reactions()->selectRaw('type, COUNT(*) as count')
+            ->groupBy('type')
+            ->orderByDesc('count')
+            ->first();
+
+        return $mostPopular ? $mostPopular->type->value : null;
+    }
+
+
+    public function getReactionPercentageAttribute(): array{
+        $total = $this->total_reactions;
+
+        if($total === 0) return [];
+
+        return $this->reaction_counts->map(fn($count) => round(($count / $total) * 100, 2))->toArray();
     }
 }

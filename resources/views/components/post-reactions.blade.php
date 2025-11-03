@@ -1,22 +1,36 @@
-@props(['post'])
+@props(['post', 'compact' => false])
+
+@php
+    $reactions = $post->reaction_counts ?? collect();
+    $total = $post->total_reactions ?? 0;
+    $userReaction = auth()->check() ? $post->userReaction(auth()->id()) : null;
+    $hasReacted = $userReaction !== null;
+    
+    $reactionTypes = [
+        'like' => ['emoji' => '👍', 'label' => 'Like', 'color' => 'blue'],
+        'love' => ['emoji' => '❤️', 'label' => 'Love', 'color' => 'red'],
+        'care' => ['emoji' => '🤗', 'label' => 'Care', 'color' => 'yellow'],
+        'haha' => ['emoji' => '😂', 'label' => 'Haha', 'color' => 'yellow'],
+        'wow' => ['emoji' => '😮', 'label' => 'Wow', 'color' => 'purple'],
+        'sad' => ['emoji' => '😢', 'label' => 'Sad', 'color' => 'gray'],
+        'angry' => ['emoji' => '😠', 'label' => 'Angry', 'color' => 'orange'],
+    ];
+@endphp
 
 <div x-data="{
     showPicker: false,
     reacting: false,
-    pickerLocked: false,
-    reactions: {{ Js::from($post->reaction_counts ?? collect()) }},
-    total: {{ $post->total_reactions ?? 0 }},
-    userReaction: {{ Js::from(optional($post->userReaction())->type) }},
-    hasReacted: {{ $post->userReaction() ? 'true' : 'false' }},
+    reactions: {{ Js::from($reactions) }},
+    total: {{ $total }},
+    userReaction: {{ Js::from($userReaction?->type?->value) }},
+    hasReacted: {{ $hasReacted ? 'true' : 'false' }},
     
     async react(type) {
         if (this.reacting) return;
         
         this.reacting = true;
         this.showPicker = false;
-        this.pickerLocked = false;
         
-        // ✅ ADDED: Check for CSRF token
         const csrfToken = document.querySelector('meta[name=csrf-token]');
         if (!csrfToken) {
             console.error('CSRF token not found');
@@ -36,15 +50,12 @@
                 body: JSON.stringify({ type })
             });
             
-            // ✅ ADDED: Better error handling
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({}));
-                console.error('Response error:', response.status, errorData);
-                throw new Error(errorData.message || `HTTP ${response.status}: ${response.statusText}`);
+                throw new Error(errorData.message || `HTTP ${response.status}`);
             }
             
             const data = await response.json();
-            console.log('Reaction response:', data);  // ✅ Debug log
             
             if (data.reactions) {
                 this.reactions = data.reactions.counts || {};
@@ -52,9 +63,19 @@
                 this.userReaction = data.reactions.user_reaction;
                 this.hasReacted = data.reactions.user_reaction !== null;
             }
+            
+            // Show success toast
+            this.$dispatch('toast', {
+                message: data.message || 'Reaction updated!',
+                type: 'success'
+            });
+            
         } catch (error) {
             console.error('Reaction error:', error);
-            alert('Failed to react: ' + error.message);
+            this.$dispatch('toast', {
+                message: 'Failed to react: ' + error.message,
+                type: 'error'
+            });
         } finally {
             this.reacting = false;
         }
@@ -62,157 +83,165 @@
     
     getEmoji(type) {
         const emojis = {
-            'like': '👍',
-            'love': '❤️',
-            'care': '🤗',
-            'haha': '😂',
-            'wow': '😮',
-            'sad': '😢',
-            'angry': '😠'
+            'like': '👍', 'love': '❤️', 'care': '🤗',
+            'haha': '😂', 'wow': '😮', 'sad': '😢', 'angry': '😠'
         };
         return emojis[type] || '👍';
     },
     
-    togglePicker() {
-        this.pickerLocked = !this.pickerLocked;
-        this.showPicker = this.pickerLocked;
+    getColor(type) {
+        const colors = {
+            'like': 'blue', 'love': 'red', 'care': 'yellow',
+            'haha': 'yellow', 'wow': 'purple', 'sad': 'gray', 'angry': 'orange'
+        };
+        return colors[type] || 'blue';
     }
 }" 
-class="flex flex-col gap-4">
+class="reaction-container">
 
-    {{-- BEFORE REACTING: Show Reaction Button with Picker --}}
-    <div x-show="!hasReacted" class="relative">
-        <button 
-            @mouseenter="if (!pickerLocked) showPicker = true"
-            @mouseleave="if (!pickerLocked) setTimeout(() => { if (!pickerLocked) showPicker = false }, 1000)"
-            @click="togglePicker()"
-            class="flex items-center gap-2 px-6 py-3 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 font-medium text-sm border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400"
-            :disabled="reacting">
-            <span class="text-xl">👍</span>
-            <span>Like</span>
-            <span x-show="reacting" class="ml-2">
-                <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-            </span>
-        </button>
-
-        {{-- Reaction Picker Popup --}}
-        <div 
-            x-show="showPicker"
-            x-transition:enter="transition ease-out duration-200"
-            x-transition:enter-start="opacity-0 scale-95 translate-y-2"
-            x-transition:enter-end="opacity-100 scale-100 translate-y-0"
-            x-transition:leave="transition ease-in duration-150"
-            x-transition:leave-start="opacity-100 scale-100"
-            x-transition:leave-end="opacity-0 scale-95"
-            @mouseenter="showPicker = true; pickerLocked = true"
-            @mouseleave="setTimeout(() => { pickerLocked = false; showPicker = false }, 500)"
-            @click.away="if (!pickerLocked) { showPicker = false; pickerLocked = false }"
-            style="display: none;"
-            class="absolute bottom-full left-0 mb-3 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border-2 border-gray-200 dark:border-gray-600 p-3 flex gap-2 z-50">
+    @if($compact)
+        {{-- COMPACT VIEW: Just show counts (for listing pages) --}}
+        <div class="flex items-center gap-3">
+            @if($total > 0)
+                <div class="flex items-center gap-2">
+                    {{-- Top 3 reaction emojis --}}
+                    <div class="flex -space-x-1">
+                        @foreach(collect($reactions)->sortDesc()->take(3) as $type => $count)
+                            <div class="w-7 h-7 rounded-full bg-white dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 flex items-center justify-center text-base shadow-sm"
+                                title="{{ ucfirst($type) }}: {{ $count }}">
+                                {{ $reactionTypes[$type]['emoji'] ?? '👍' }}
+                            </div>
+                        @endforeach
+                    </div>
+                    
+                    {{-- Count --}}
+                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        {{ $total }}
+                    </span>
+                </div>
+            @else
+                <span class="text-sm text-gray-500 dark:text-gray-400">No reactions yet</span>
+            @endif
+        </div>
+    @else
+        {{-- FULL INTERACTIVE VIEW: For post detail page --}}
+        <div class="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-lg">
             
-            @foreach(['like', 'love', 'care', 'haha', 'wow', 'sad', 'angry'] as $type)
-                <button 
-                    type="button"
-                    @click.prevent="react('{{ $type }}')"
-                    class="w-12 h-12 rounded-full flex items-center justify-center text-3xl transition-all duration-200 hover:scale-150 hover:bg-gray-100 dark:hover:bg-gray-700"
-                    title="{{ ucfirst($type) }}">
-                    {{ match($type) {
-                        'like' => '👍',
-                        'love' => '❤️',
-                        'care' => '🤗',
-                        'haha' => '😂',
-                        'wow' => '😮',
-                        'sad' => '😢',
-                        'angry' => '😠',
-                    } }}
-                </button>
-            @endforeach
-        </div>
-    </div>
-
-    {{-- AFTER REACTING: Show Reaction Counter with All Types --}}
-    <div x-show="hasReacted" x-cloak class="space-y-3">
-        {{-- Your Reaction (Highlighted) --}}
-        <div class="flex items-center gap-2 px-4 py-2 bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-200 dark:border-blue-800 rounded-full">
-            <span class="text-xl" x-text="getEmoji(userReaction)"></span>
-            <span class="text-sm font-semibold text-blue-700 dark:text-blue-300">
-                You reacted with <span x-text="userReaction" class="capitalize"></span>
-            </span>
-            <button 
-                @click="react(userReaction)"
-                class="ml-auto text-xs text-blue-600 dark:text-blue-400 hover:underline"
-                :disabled="reacting">
-                Remove
-            </button>
-        </div>
-
-        {{-- All Reactions Counter --}}
-        <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
-            <div class="flex items-center justify-between mb-3">
-                <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300">Reactions</h4>
-                <span class="text-xs text-gray-500 dark:text-gray-400">
+            {{-- Header --}}
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                    <svg class="w-5 h-5 text-pink-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"></path>
+                    </svg>
+                    Reactions
+                </h3>
+                <span class="text-sm font-semibold text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-700 px-3 py-1 rounded-full">
                     <span x-text="total"></span> total
                 </span>
             </div>
 
-            {{-- Reaction Types Grid --}}
-            <div class="grid grid-cols-7 gap-2">
-                <template x-for="(count, type) in reactions" :key="type">
-                    <button
-                        @click="react(type)"
-                        :class="type === userReaction ? 'ring-2 ring-blue-500 bg-blue-100 dark:bg-blue-900' : 'hover:bg-gray-200 dark:hover:bg-gray-700'"
-                        class="flex flex-col items-center justify-center p-2 rounded-lg transition-all duration-200 group"
-                        :title="`React with ${type}`">
-                        <span class="text-2xl group-hover:scale-125 transition-transform" x-text="getEmoji(type)"></span>
-                        <span class="text-xs font-semibold text-gray-600 dark:text-gray-400 mt-1" x-text="count"></span>
+            {{-- User's Current Reaction (if any) --}}
+            <div x-show="hasReacted" x-cloak x-transition class="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 rounded-lg">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="text-2xl" x-text="getEmoji(userReaction)"></span>
+                        <span class="text-sm font-semibold text-blue-700 dark:text-blue-300">
+                            You reacted with <span x-text="userReaction" class="capitalize"></span>
+                        </span>
+                    </div>
+                    <button 
+                        @click="react(userReaction)"
+                        class="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 font-medium underline"
+                        :disabled="reacting">
+                        Remove
                     </button>
-                </template>
+                </div>
             </div>
 
-            <div class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
-                <p class="text-xs text-gray-500 dark:text-gray-400 text-center">
-                    Click any reaction to change yours
-                </p>
+            {{-- Reaction Picker Buttons --}}
+            <div class="grid grid-cols-7 gap-2 mb-4">
+                @foreach($reactionTypes as $type => $data)
+                    <button
+                        @click="react('{{ $type }}')"
+                        :class="{
+                            'ring-4 ring-{{ $data['color'] }}-500 ring-opacity-50 scale-110': userReaction === '{{ $type }}',
+                            'hover:scale-110 hover:bg-{{ $data['color'] }}-50 dark:hover:bg-{{ $data['color'] }}-900/20': userReaction !== '{{ $type }}'
+                        }"
+                        :disabled="reacting"
+                        class="group relative flex flex-col items-center justify-center p-3 rounded-xl bg-white dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 transition-all duration-200 hover:shadow-lg hover:-translate-y-1"
+                        title="{{ $data['label'] }}">
+                        
+                        {{-- Emoji --}}
+                        <span class="text-3xl group-hover:scale-125 transition-transform duration-200">
+                            {{ $data['emoji'] }}
+                        </span>
+                        
+                        {{-- Count Badge --}}
+                        <span 
+                            x-show="reactions['{{ $type }}'] > 0"
+                            x-text="reactions['{{ $type }}']"
+                            class="absolute -top-1 -right-1 bg-{{ $data['color'] }}-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-md">
+                        </span>
+                        
+                        {{-- Label --}}
+                        <span class="text-xs font-medium text-gray-600 dark:text-gray-400 mt-1">
+                            {{ $data['label'] }}
+                        </span>
+                    </button>
+                @endforeach
             </div>
 
-            @if($post->total_reactions > 5)
-                <a href="{{ route('reactions.users', $post) }}" 
-                    class="mt-3 block text-center text-sm text-blue-600 dark:text-blue-400 hover:underline">
-                    View all {{ $post->total_reactions }} reactions →
-                </a>
+            {{-- Reaction Breakdown (if reactions exist) --}}
+            <div x-show="total > 0" x-cloak class="space-y-2">
+                <div class="border-t border-gray-200 dark:border-gray-700 pt-4">
+                    <h4 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-2">Breakdown</h4>
+                    <template x-for="(count, type) in reactions" :key="type">
+                        <div x-show="count > 0" class="flex items-center justify-between py-2 px-3 rounded-lg bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
+                            <div class="flex items-center gap-2">
+                                <span class="text-xl" x-text="getEmoji(type)"></span>
+                                <span class="text-sm font-medium text-gray-700 dark:text-gray-300 capitalize" x-text="type"></span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm font-bold text-gray-900 dark:text-white" x-text="count"></span>
+                                <div class="w-16 bg-gray-200 dark:bg-gray-600 rounded-full h-2">
+                                    <div 
+                                        :class="'bg-' + getColor(type) + '-500'"
+                                        class="h-2 rounded-full transition-all duration-500"
+                                        :style="'width: ' + Math.round((count / total) * 100) + '%'">
+                                    </div>
+                                </div>
+                                <span class="text-xs text-gray-500 dark:text-gray-400" x-text="Math.round((count / total) * 100) + '%'"></span>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+            {{-- Loading State --}}
+            <div x-show="reacting" x-cloak class="absolute inset-0 bg-white/80 dark:bg-gray-900/80 rounded-2xl flex items-center justify-center">
+                <div class="flex flex-col items-center gap-2">
+                    <svg class="animate-spin h-8 w-8 text-blue-500" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Processing...</span>
+                </div>
+            </div>
+
+            {{-- View All Reactions Link --}}
+            @if($total > 10)
+                <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <a href="{{ route('reactions.users', $post) }}" 
+                        class="block text-center text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 hover:underline">
+                        View all {{ $total }} reactions →
+                    </a>
+                </div>
             @endif
         </div>
-
-        {{-- Quick Change Picker --}}
-        <div class="flex items-center justify-center gap-2">
-            @foreach(['like', 'love', 'care', 'haha', 'wow', 'sad', 'angry'] as $type)
-                <button 
-                    type="button"
-                    @click.prevent="react('{{ $type }}')"
-                    :class="userReaction === '{{ $type }}' ? 'scale-125 ring-2 ring-blue-500' : 'hover:scale-125 opacity-60 hover:opacity-100'"
-                    class="w-10 h-10 rounded-full flex items-center justify-center text-2xl transition-all duration-200"
-                    title="Change to {{ ucfirst($type) }}">
-                    {{ match($type) {
-                        'like' => '👍',
-                        'love' => '❤️',
-                        'care' => '🤗',
-                        'haha' => '😂',
-                        'wow' => '😮',
-                        'sad' => '😢',
-                        'angry' => '😠',
-                    } }}
-                </button>
-            @endforeach
-        </div>
-    </div>
+    @endif
 
 </div>
 
 <style>
-    [x-cloak] { 
-        display: none !important; 
-    }
+    [x-cloak] { display: none !important; }
 </style>

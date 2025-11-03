@@ -60,11 +60,19 @@
                     <div class="ml-4 flex items-center gap-3">
                         {{-- ✅ Auth Buttons --}}
                         @auth
-                            {{-- If logged in, show Dashboard link --}}
-                            <a href="{{ route('dashboard') }}"
-                                class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors duration-200 shadow-sm">
-                                Dashboard
-                            </a>
+                            @if(auth()->user()->hasRole(['admin', 'editor', 'writer']))
+                                {{-- Admin/Editor/Writer see Dashboard button --}}
+                                <a href="{{ route('dashboard') }}"
+                                    class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors duration-200 shadow-sm">
+                                    Dashboard
+                                </a>
+                            @else
+                                {{-- Regular users see Profile button --}}
+                                <a href="{{ route('profile.edit') }}"
+                                    class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors duration-200 shadow-sm">
+                                    Profile
+                                </a>
+                            @endif
                         @else
                             {{-- If not logged in, show Login & Register buttons --}}
                             <a href="{{ route('login') }}"
@@ -121,12 +129,16 @@
                         <a href="{{ route('posts.index', ['category' => 'culture']) }}"
                             class="text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 font-medium px-4">Culture</a>
                         @auth
-                            <a href="{{ route('dashboard') }}"
-                                class="text-blue-600 dark:text-blue-400 font-semibold px-4">Dashboard</a>
+                            @if(auth()->user()->hasRole(['admin', 'editor', 'writer']))
+                                <a href="{{ route('dashboard') }}"
+                                    class="text-blue-600 dark:text-blue-400 font-semibold px-4">Dashboard</a>
+                            @else
+                                <a href="{{ route('profile.edit') }}"
+                                    class="text-blue-600 dark:text-blue-400 font-semibold px-4">Profile</a>
+                            @endif
                         @else
                             <a href="{{ route('login') }}"
-                                class="text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 font-medium px-4">Log
-                                in</a>
+                                class="text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 font-medium px-4">Log in</a>
                             @if (Route::has('register'))
                                 <a href="{{ route('register') }}"
                                     class="text-blue-600 dark:text-blue-400 font-semibold px-4">Sign up</a>

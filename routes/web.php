@@ -4,7 +4,6 @@ use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Livewire\Volt\Volt;
-use App\Livewire\SettingForm;
 use App\Livewire\About;
 use App\Livewire\Contact;
 use App\Http\Controllers\PostController;
@@ -22,18 +21,26 @@ Route::get('/', function () {
 Route::get('/posts', [PublicPostController::class, 'index'])->name('public.posts.index');
 Route::get('/posts/{id}', [PublicPostController::class, 'show'])->name('public.posts.show');
 
+// About and Contact pages (Livewire)
+Route::get('/about', About::class)->name('about');
+Route::get('/contact', Contact::class)->name('contact');
+
+// Terms of Service and Privacy Policy pages
+Route::view('terms', 'terms-of-service.index')->name('terms');
+Route::view('privacy', 'privacy-policy.index')->name('privacy');
+
+// Newsletter public routes
+Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
+Route::get('/newsletter/unsubscribe/{token}', [NewsletterController::class, 'unsubscribe'])->name('newsletter.unsubscribe');
+
 // Reactions routes (auth required)
 Route::middleware(['auth'])->group(function () {
     Route::post('/posts/{post}/reactions', [ReactionController::class, 'toggle'])->name('reactions.toggle');
     Route::get('/posts/{post}/reactions/{type?}', [ReactionController::class, 'users'])->name('reactions.users');
 });
 
-// Newsletter public routes
-Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
-Route::get('/newsletter/unsubscribe/{token}', [NewsletterController::class, 'unsubscribe'])->name('newsletter.unsubscribe');
-
-// ADMIN ROUTES
-Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
+// ✅ ADMIN ROUTES (admin, editor, writer ONLY)
+Route::middleware(['auth', 'verified', 'admin.only'])->prefix('admin')->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     
@@ -54,31 +61,11 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
     Route::patch('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
     Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
 
-});
-
-// Settings Form
-Route::get('/settings-form', SettingForm::class)->middleware(['auth']);
-
-// About page
-Route::get('/about', function () {
-    return view('about');
-})->name('about');
-
-// Contact page
-Route::get('/contact', function () {
-    return view('contact');
-})->name('contact');
-
-// Terms of Service and Privacy Policy pages
-Route::view('terms', 'terms-of-service.index')->name('terms');
-Route::view('privacy', 'privacy-policy.index')->name('privacy');
-
-Route::middleware(['auth'])->group(function () {
+    // ✅ Admin Settings (unique names)
     Route::redirect('settings', 'settings/profile');
-
-    Volt::route('settings/profile', 'settings.profile')->name('profile.edit');
-    Volt::route('settings/password', 'settings.password')->name('user-password.edit');
-    Volt::route('settings/appearance', 'settings.appearance')->name('appearance.edit');
+    Volt::route('settings/profile', 'settings.profile')->name('admin.profile.edit');
+    Volt::route('settings/password', 'settings.password')->name('admin.password.edit');
+    Volt::route('settings/appearance', 'settings.appearance')->name('admin.appearance.edit');
 
     Volt::route('settings/two-factor', 'settings.two-factor')
         ->middleware(
@@ -89,5 +76,27 @@ Route::middleware(['auth'])->group(function () {
                 [],
             ),
         )
-        ->name('two-factor.show');
+        ->name('admin.two-factor.show');
+});
+
+// ✅ USER ROUTES (role:user ONLY)
+Route::middleware(['auth', 'verified', 'user.only'])->prefix('user')->group(function () {
+    // Redirect /user to /user/settings/profile
+    Route::redirect('/', 'settings/profile');
+    
+    // ✅ User Settings (unique names)
+    Volt::route('settings/profile', 'user.settings.profile')->name('user.profile.edit');
+    Volt::route('settings/password', 'user.settings.password')->name('user.password.edit');
+    Volt::route('settings/appearance', 'user.settings.appearance')->name('user.appearance.edit');
+
+    Volt::route('settings/two-factor', 'user.settings.two-factor')
+        ->middleware(
+            when(
+                Features::canManageTwoFactorAuthentication()
+                    && Features::optionEnabled(Features::twoFactorAuthentication(), 'confirmPassword'),
+                ['password.confirm'],
+                [],
+            ),
+        )
+        ->name('user.two-factor.show');
 });

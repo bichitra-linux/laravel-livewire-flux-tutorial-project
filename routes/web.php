@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Livewire\Volt\Volt;
 use App\Livewire\SettingForm;
+use App\Livewire\About;
+use App\Livewire\Contact;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PublicPostController;
@@ -58,7 +60,15 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
 Route::get('/settings-form', SettingForm::class)->middleware(['auth']);
 
 // About page
-Route::view('about', 'about')->name('about');
+Route::get('/about', function () {
+    return view('about');
+})->name('about');
+
+// Contact page
+Route::get('/contact', function () {
+    return view('contact');
+})->name('contact');
+
 // Terms of Service and Privacy Policy pages
 Route::view('terms', 'terms-of-service.index')->name('terms');
 Route::view('privacy', 'privacy-policy.index')->name('privacy');

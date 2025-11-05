@@ -12,7 +12,8 @@
                     <ul class="space-y-2 text-sm">
                         <li><a href="{{ route('home') }}" class="text-gray-300 hover:text-blue-400 hover:underline transition-colors duration-200">Home</a></li>
                         <li><a href="{{ route('public.posts.index') }}" class="text-gray-300 hover:text-blue-400 hover:underline transition-colors duration-200">Posts</a></li>
-                        <li><a href="{{  '#' }}" class="text-gray-300 hover:text-blue-400 hover:underline transition-colors duration-200">Contact</a></li>
+                        <li><a href="{{ route('about') }}" class="text-gray-300 hover:text-blue-400 hover:underline transition-colors duration-200">About</a></li>
+                        <li><a href="{{ route('contact') }}" class="text-gray-300 hover:text-blue-400 hover:underline transition-colors duration-200">Contact</a></li>
                     </ul>
                 </div>
             </nav>

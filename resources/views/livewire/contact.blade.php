@@ -1,5 +1,4 @@
 <div>
-    <x-blog-header title="Contact" />
 
     <div class="max-w-4xl mx-auto px-6 py-12">
         <div class="prose dark:prose-invert max-w-none">
@@ -253,7 +252,6 @@
         </div>
     </div>
 
-    <x-footer />
 
     @push('scripts')
     <script>

@@ -23,7 +23,7 @@ class Post extends Model
         'views',
     ];
 
-    protected $appends = ['reaction_counts', 'total_reactions'];
+    protected $appends = ['reaction_counts', 'total_reactions', 'comments_count'];
 
     public function user()
     {
@@ -175,4 +175,18 @@ class Post extends Model
 
         return $this->reaction_counts->map(fn($count) => round(($count / $total) * 100, 2))->toArray();
     }
+
+
+    public function comments(){
+        return $this->hasMany(Comment::class);
+    }
+
+    public function approvedComments(){
+        return $this->hasMany(Comment::class)->approved();
+    }
+
+    public function getCommentsCountAttribute(){
+        return $this->comments()->approved()->count();
+    }
+
 }

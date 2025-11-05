@@ -220,6 +220,9 @@
                         @endif
                     </article>
 
+                    {{-- Comment Section (Livewire with auto-refresh) --}}
+@livewire('comment-section', ['post' => $post])
+
                     {{-- Related Posts --}}
                     <section class="mt-12">
                         <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Related Posts</h2>

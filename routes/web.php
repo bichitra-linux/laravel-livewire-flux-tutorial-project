@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Http\Request;
 use Laravel\Fortify\Features;
 use Livewire\Volt\Volt;
 use App\Livewire\About;
@@ -62,6 +64,21 @@ Route::middleware(['auth', 'verified', 'admin.only'])->prefix('admin')->group(fu
     Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
 
     // ✅ Admin Settings (unique names)
+
+    Route::get('confirm-password', fn() => view('livewire.auth.confirm-password'))
+        ->name('admin.password.confirm');
+    
+    Route::post('confirm-password', function (Request $request) {
+        if (! Hash::check($request->password, $request->user()->password)) {
+            return back()->withErrors([
+                'password' => __('The provided password does not match our records.'),
+            ]);
+        }
+
+        $request->session()->put('auth.password_confirmed_at', time());
+        return redirect()->intended();
+    })->name('admin.password.confirm.store');
+
     Route::redirect('settings', 'settings/profile');
     Volt::route('settings/profile', 'settings.profile')->name('admin.profile.edit');
     Volt::route('settings/password', 'settings.password')->name('admin.password.edit');
@@ -83,6 +100,20 @@ Route::middleware(['auth', 'verified', 'admin.only'])->prefix('admin')->group(fu
 Route::middleware(['auth', 'verified', 'user.only'])->prefix('user')->group(function () {
     // Redirect /user to /user/settings/profile
     Route::redirect('/', 'settings/profile');
+
+    Route::get('confirm-password', fn() => view('livewire.auth.confirm-password'))
+        ->name('user.password.confirm');
+    
+    Route::post('confirm-password', function (Request $request) {
+        if (! Hash::check($request->password, $request->user()->password)) {
+            return back()->withErrors([
+                'password' => __('The provided password does not match our records.'),
+            ]);
+        }
+
+        $request->session()->put('auth.password_confirmed_at', time());
+        return redirect()->intended();
+    })->name('user.password.confirm.store');
     
     // ✅ User Settings (unique names)
     Volt::route('settings/profile', 'user.settings.profile')->name('user.profile.edit');

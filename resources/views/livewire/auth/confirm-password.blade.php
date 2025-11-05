@@ -7,7 +7,13 @@
 
         <x-auth-session-status class="text-center" :status="session('status')" />
 
-        <form method="POST" action="{{ route('password.confirm.store') }}" class="flex flex-col gap-6">
+        @php
+            $user = auth()->user();
+            $isAdmin = $user && $user->hasRole(['admin', 'editor', 'writer']);
+            $confirmRoute = $isAdmin ? 'admin.password.confirm.store' : 'user.password.confirm.store';
+        @endphp
+
+        <form method="POST" action="{{ route($confirmRoute) }}" class="flex flex-col gap-6">
             @csrf
 
             <flux:input

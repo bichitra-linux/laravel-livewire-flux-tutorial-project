@@ -16,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             'user.only' => \App\Http\Middleware\UserOnly::class,
             'admin.only' => \App\Http\Middleware\AdminOnly::class,
+            'password.confirm' => \App\Http\Middleware\RequirePasswordConfirmation::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

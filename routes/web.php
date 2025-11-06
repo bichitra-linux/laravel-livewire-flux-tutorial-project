@@ -14,6 +14,7 @@ use App\Http\Controllers\PublicPostController;
 use App\Http\Controllers\ReactionController;
 use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\CommentController;
 
 Route::get('/', function () {
     return view('home');
@@ -52,6 +53,9 @@ Route::middleware(['auth', 'verified', 'admin.only'])->prefix('admin')->group(fu
     
     // Posts Management
     Route::resource('posts', PostController::class);
+
+    // Comments Management
+    Route::get('/comments', [CommentController::class, 'index'])->name('comments.index');
     
     // Newsletter Management
     Route::get('/newsletter', [NewsletterController::class, 'index'])->name('newsletter.index');
@@ -59,6 +63,8 @@ Route::middleware(['auth', 'verified', 'admin.only'])->prefix('admin')->group(fu
     
     // Users Management 
     Route::resource('users', UserController::class)->only(['index', 'show', 'destroy']);
+
+
 
     // Notifications Management
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');

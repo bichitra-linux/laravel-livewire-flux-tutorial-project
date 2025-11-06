@@ -1,3 +1,4 @@
+{{-- filepath: c:\Users\bichi\OneDrive\Documents\techno\tutorial\turorial\resources\views\dashboard.blade.php --}}
 <x-layouts.app.sidebar :title="__('Dashboard')">
     <flux:main container class="space-y-6">
         {{-- Welcome Section with Time-based Greeting --}}
@@ -11,7 +12,7 @@
                         @endphp
                         {{ $greeting }}, {{ auth()->user()->name }}! 👋
                     </h1>
-                    <p class="text-blue-100 mt-2">Here's what's happening with your blog today.</p>
+                    <p class="text-zinc-600 dark:text-zinc-400 mt-2">Here's what's happening with your blog today.</p>
                 </div>
                 <div class="hidden md:block">
                     <svg class="w-24 h-24 opacity-50" fill="currentColor" viewBox="0 0 20 20">
@@ -93,7 +94,7 @@
         </div>
 
         {{-- Secondary Stats Row --}}
-        <div class="grid gap-4 md:grid-cols-3">
+        <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {{-- Total Views --}}
             <div class="bg-white dark:bg-zinc-800 rounded-xl p-4 shadow-lg">
                 <div class="flex items-center gap-3">
@@ -125,6 +126,21 @@
                 </div>
             </div>
 
+            {{-- Total Comments --}}
+            <div class="bg-white dark:bg-zinc-800 rounded-xl p-4 shadow-lg">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 rounded-lg bg-orange-100 dark:bg-orange-900/30">
+                        <svg class="w-6 h-6 text-orange-600 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-xs text-zinc-600 dark:text-zinc-400">Total Comments</p>
+                        <p class="text-xl font-bold text-zinc-900 dark:text-white">{{ number_format($totalComments) }}</p>
+                    </div>
+                </div>
+            </div>
+
             {{-- Categories --}}
             <div class="bg-white dark:bg-zinc-800 rounded-xl p-4 shadow-lg">
                 <div class="flex items-center gap-3">
@@ -141,86 +157,206 @@
             </div>
         </div>
 
-        {{-- Main Content Grid --}}
-        <div class="grid gap-6 lg:grid-cols-3">
-            {{-- Recent Posts (Larger Column) --}}
-            <div class="lg:col-span-2 bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-lg">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-xl font-bold text-zinc-900 dark:text-white flex items-center gap-2">
-                        <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>
+        {{-- Engagement Rate & Top Post Row --}}
+        <div class="grid gap-4 lg:grid-cols-2">
+            {{-- Engagement Rate Card --}}
+            <div class="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-lg dark:text-white">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-cyan-100 text-sm font-medium mb-2">Overall Engagement Rate</p>
+                        <p class="text-4xl font-bold">{{ number_format($engagementRate, 1) }}%</p>
+                        <p class="text-cyan-100 text-xs mt-2">
+                            Based on {{ number_format($totalReactions + $totalComments) }} interactions
+                        </p>
+                    </div>
+                    <div class="p-4 bg-white/10 rounded-full backdrop-blur-sm">
+                        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
                         </svg>
-                        Recent Posts
-                    </h2>
-                    <a href="{{ route('posts.index') }}" class="text-sm text-blue-600 dark:text-blue-400 hover:underline">View All →</a>
+                    </div>
                 </div>
-                
-                @if($recentPosts->count() > 0)
-                    <div class="space-y-3">
-                        @foreach($recentPosts as $post)
-                            <div class="flex items-start gap-4 p-4 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-700/50 transition-colors group">
-                                {{-- Post Image/Icon --}}
-                                @if($post->image)
-                                    <img src="{{ asset('storage/' . $post->image) }}" alt="{{ $post->title }}" class="w-16 h-16 rounded-lg object-cover flex-shrink-0">
-                                @else
-                                    <div class="w-16 h-16 rounded-lg bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center flex-shrink-0">
-                                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                                        </svg>
-                                    </div>
-                                @endif
+            </div>
 
-                                {{-- Post Info --}}
-                                <div class="flex-1 min-w-0">
-                                    <a href="{{ route('posts.show', $post) }}" class="text-zinc-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 font-semibold line-clamp-1 transition-colors">
-                                        {{ $post->title }}
-                                    </a>
-                                    <div class="flex items-center gap-3 mt-1 text-xs text-zinc-500 dark:text-zinc-400">
-                                        <span class="flex items-center gap-1">
-                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
-                                            </svg>
-                                            {{ $post->category?->name ?? 'Uncategorized' }}
-                                        </span>
-                                        <span class="flex items-center gap-1">
-                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                                            </svg>
-                                            {{ number_format($post->views) }}
-                                        </span>
-                                        <span>{{ $post->created_at->diffForHumans() }}</span>
-                                    </div>
-                                    <div class="flex items-center gap-2 mt-2">
-                                        <span class="px-2 py-0.5 text-xs font-medium rounded-full {{ $post->status->value === 'published' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' }}">
-                                            {{ $post->status->label() }}
-                                        </span>
-                                    </div>
-                                </div>
-
-                                {{-- Actions --}}
-                                <a href="{{ route('posts.edit', $post) }}" class="opacity-0 group-hover:opacity-100 transition-opacity text-blue-600 dark:text-blue-400 hover:underline text-sm whitespace-nowrap">
-                                    Edit →
-                                </a>
-                            </div>
-                        @endforeach
+            {{-- Most Popular Post --}}
+            <div class="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-lg dark:text-white">
+                <h2 class="text-lg font-bold mb-3 flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
+                    </svg>
+                    Top Post This Week
+                </h2>
+                @if($topPost)
+                    <p class="font-semibold text-lg mb-3 line-clamp-2">{{ $topPost->title }}</p>
+                    <div class="flex items-center gap-4 text-sm bg-white/10 backdrop-blur-sm rounded-lg p-3">
+                        <span class="flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                            </svg>
+                            {{ number_format($topPost->views) }}
+                        </span>
+                        <span class="flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                            </svg>
+                            {{ $topPost->reactions_count }}
+                        </span>
+                        <span class="flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                            </svg>
+                            {{ $topPost->comments_count }}
+                        </span>
                     </div>
                 @else
-                    <div class="text-center py-12">
-                        <svg class="mx-auto h-12 w-12 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                        </svg>
-                        <p class="mt-4 text-zinc-600 dark:text-zinc-400">No posts yet.</p>
-                        <a href="{{ route('posts.create') }}" class="mt-2 inline-flex items-center text-blue-600 dark:text-blue-400 hover:underline">
-                            Create your first post →
-                        </a>
+                    <p class="text-purple-100 text-sm">No published posts yet</p>
+                @endif
+            </div>
+        </div>
+
+        {{-- Reaction Breakdown --}}
+        @if($totalReactions > 0)
+        <div class="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-lg">
+            <h2 class="text-lg font-bold text-zinc-900 dark:text-white mb-4 flex items-center gap-2">
+                <svg class="w-6 h-6 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Reaction Breakdown
+            </h2>
+            <div class="grid gap-3 md:grid-cols-2 lg:grid-cols-5">
+                @foreach(\App\Enums\ReactionType::cases() as $reactionType)
+                    @php
+                        $count = $reactionBreakdown[$reactionType->value] ?? 0;
+                        $percentage = $totalReactions > 0 ? ($count / $totalReactions * 100) : 0;
+                    @endphp
+                    <div class="flex items-center justify-between p-4 rounded-lg bg-zinc-50 dark:bg-zinc-700/50">
+                        <div class="flex items-center gap-3">
+                            <span class="text-3xl">{{ $reactionType->emoji() }}</span>
+                            <div>
+                                <p class="text-xs text-zinc-600 dark:text-zinc-400">{{ ucfirst($reactionType->value) }}</p>
+                                <p class="text-lg font-bold text-zinc-900 dark:text-white">{{ number_format($count) }}</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-sm font-semibold text-zinc-900 dark:text-white">{{ number_format($percentage, 1) }}%</p>
+                            <div class="w-16 h-1.5 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden mt-1">
+                                <div class="h-full {{ $reactionType->bgColor() }}" style="width: {{ $percentage }}%"></div>
+                            </div>
+                        </div>
                     </div>
+                @endforeach
+            </div>
+        </div>
+        @endif
+
+        {{-- Main Content Grid --}}
+        <div class="grid gap-6 lg:grid-cols-3">
+            {{-- Recent Posts & Activity --}}
+            <div class="lg:col-span-2 space-y-6">
+                {{-- Recent Posts --}}
+                <div class="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-lg">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-xl font-bold text-zinc-900 dark:text-white flex items-center gap-2">
+                            <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>
+                            </svg>
+                            Recent Posts
+                        </h2>
+                        <a href="{{ route('posts.index') }}" class="text-sm text-blue-600 dark:text-blue-400 hover:underline">View All →</a>
+                    </div>
+                    
+                    @if($recentPosts->count() > 0)
+                        <div class="space-y-3">
+                            @foreach($recentPosts as $post)
+                                <div class="flex items-start gap-4 p-4 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-700/50 transition-colors group">
+                                    {{-- Post Image/Icon --}}
+                                    @if($post->image)
+                                        <img src="{{ asset('storage/' . $post->image) }}" alt="{{ $post->title }}" class="w-16 h-16 rounded-lg object-cover flex-shrink-0">
+                                    @else
+                                        <div class="w-16 h-16 rounded-lg bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center flex-shrink-0">
+                                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                            </svg>
+                                        </div>
+                                    @endif
+
+                                    {{-- Post Info --}}
+                                    <div class="flex-1 min-w-0">
+                                        <a href="{{ route('posts.show', $post) }}" class="text-zinc-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 font-semibold line-clamp-1 transition-colors">
+                                            {{ $post->title }}
+                                        </a>
+                                        <div class="flex items-center gap-3 mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+                                            <span class="flex items-center gap-1">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                                                </svg>
+                                                {{ $post->category?->name ?? 'Uncategorized' }}
+                                            </span>
+                                            <span class="flex items-center gap-1">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                                </svg>
+                                                {{ number_format($post->views) }}
+                                            </span>
+                                            <span>{{ $post->created_at->diffForHumans() }}</span>
+                                        </div>
+                                        <div class="flex items-center gap-2 mt-2">
+                                            <span class="px-2 py-0.5 text-xs font-medium rounded-full {{ $post->status->value === 'published' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' }}">
+                                                {{ $post->status->label() }}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    {{-- Actions --}}
+                                    <a href="{{ route('posts.edit', $post) }}" class="opacity-0 group-hover:opacity-100 transition-opacity text-blue-600 dark:text-blue-400 hover:underline text-sm whitespace-nowrap">
+                                        Edit →
+                                    </a>
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="text-center py-12">
+                            <svg class="mx-auto h-12 w-12 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            <p class="mt-4 text-zinc-600 dark:text-zinc-400">No posts yet.</p>
+                            <a href="{{ route('posts.create') }}" class="mt-2 inline-flex items-center text-blue-600 dark:text-blue-400 hover:underline">
+                                Create your first post →
+                            </a>
+                        </div>
+                    @endif
+                </div>
+
+                {{-- Recent Activity --}}
+                @if(count($recentActivities) > 0)
+                <div class="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-lg">
+                    <h2 class="text-lg font-bold text-zinc-900 dark:text-white mb-4 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Recent Activity
+                    </h2>
+                    <div class="space-y-3">
+                        @foreach($recentActivities as $activity)
+                        <div class="flex items-start gap-3 pb-3 border-b border-zinc-200 dark:border-zinc-700 last:border-0">
+                            <div class="p-2 rounded-lg {{ $activity['color'] }}">
+                                {!! $activity['icon'] !!}
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm text-zinc-900 dark:text-white">{{ $activity['description'] }}</p>
+                                <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1">{{ $activity['time'] }}</p>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
                 @endif
             </div>
 
-            {{-- Quick Actions --}}
+            {{-- Sidebar --}}
             <div class="space-y-6">
-                {{-- Actions Card --}}
+                {{-- Quick Actions --}}
                 <div class="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-lg">
                     <h2 class="text-xl font-bold text-zinc-900 dark:text-white mb-4 flex items-center gap-2">
                         <svg class="w-6 h-6 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -256,6 +392,30 @@
                         </a>
                     </div>
                 </div>
+
+                {{-- Comment Status --}}
+                @if($totalComments > 0 || $pendingComments > 0)
+                <div class="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-lg">
+                    <h2 class="text-lg font-bold text-zinc-900 dark:text-white mb-4 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                        </svg>
+                        Comments
+                    </h2>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between p-3 rounded-lg bg-green-50 dark:bg-green-900/20">
+                            <span class="text-sm font-medium text-zinc-900 dark:text-white">Approved</span>
+                            <span class="text-lg font-bold text-green-600 dark:text-green-400">{{ number_format($totalComments) }}</span>
+                        </div>
+                        @if($pendingComments > 0)
+                        <div class="flex items-center justify-between p-3 rounded-lg bg-orange-50 dark:bg-orange-900/20">
+                            <span class="text-sm font-medium text-zinc-900 dark:text-white">Pending</span>
+                            <span class="text-lg font-bold text-orange-600 dark:text-orange-400">{{ number_format($pendingComments) }}</span>
+                        </div>
+                        @endif
+                    </div>
+                </div>
+                @endif
 
                 {{-- Top Categories --}}
                 @if($topCategories->count() > 0)

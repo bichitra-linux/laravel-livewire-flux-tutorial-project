@@ -11,6 +11,7 @@ class Contact extends Component
 
     public $name = '';
     public $email = '';
+    public $subject = '';
     public $message = '';
     public $successMessage = '';
     public $errorMessage = '';
@@ -34,7 +35,7 @@ class Contact extends Component
         $validated = $this->validate();
 
         try{
-            Mail::to(config('mail.from.addess'))->send(new ContactMail($validated));
+            Mail::to(config('mail.from.address'))->send(new ContactMail($validated));
             $this->successMessage = "Your message has been sent successfully!";
             $this->errorMessage = '';
             $this->reset(['name', 'email', 'subject', 'message']);

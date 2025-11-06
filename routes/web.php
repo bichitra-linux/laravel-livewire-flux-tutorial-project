@@ -24,8 +24,12 @@ Route::get('/posts', [PublicPostController::class, 'index'])->name('public.posts
 Route::get('/posts/{id}', [PublicPostController::class, 'show'])->name('public.posts.show');
 
 // About and Contact pages (Livewire)
-Route::get('/about', About::class)->name('about');
-Route::get('/contact', Contact::class)->name('contact');
+Route::get('/about', function() {
+    return view('about');
+})->name('about');
+Route::get('/contact', function() {
+    return view('contact');
+})->name('contact');
 
 // Terms of Service and Privacy Policy pages
 Route::view('terms', 'terms-of-service.index')->name('terms');

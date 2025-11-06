@@ -16,9 +16,14 @@ class CommentSection extends Component
     public $editingCommentId = null;
     public $editingContent = '';
     public $replyToUsername = '';
-    
+
+    public $sortBy = 'latest';
+
     // Remove polling - we'll use manual refresh instead
     public $lastUpdated;
+
+    public $isExpanded = false;
+    public $allThreadsExpanded = false;
 
     protected $rules = [
         'content' => 'required|string|min:3|max:1000',
@@ -30,11 +35,29 @@ class CommentSection extends Component
         $this->lastUpdated = now()->timestamp;
     }
 
+    public function toggleSection(){
+        $this->isExpanded = !$this->isExpanded;
+
+        if ($this->isExpanded){
+            $this->dispatch('section-expanded');
+        }
+    }
+
+    public function collapseAllThreads(){
+        $this->allThreadsExpanded = false;
+        $this->dispatch('threads-collapsed');
+    }
+
+    public function expandAllThreads(){
+        $this->allThreadsExpanded = true;
+        $this->dispatch('threads-expanded');
+    }
+
     public function postComment()
     {
         // Rate limiting
         $key = 'comment:' . auth()->id();
-        
+
         if (RateLimiter::tooManyAttempts($key, 5)) {
             $seconds = RateLimiter::availableIn($key);
             $this->addError('content', "Too many comments. Please try again in {$seconds} seconds.");
@@ -58,7 +81,7 @@ class CommentSection extends Component
             'user_id' => auth()->id(),
             'post_id' => $this->post->id,
             'parent_id' => $this->parentId,
-            'content' => $this->content,
+            'content' => trim($this->content),
             'is_approved' => true,
         ]);
 
@@ -66,9 +89,11 @@ class CommentSection extends Component
         $this->parentId = null;
         $this->replyToUsername = '';
         $this->lastUpdated = now()->timestamp;
-        
+
+        $this->isExpanded = true;
+
         session()->flash('message', 'Comment posted successfully!');
-        
+
         // Broadcast to other users
         $this->dispatch('comment-posted');
     }
@@ -77,6 +102,7 @@ class CommentSection extends Component
     {
         $this->parentId = $commentId;
         $this->replyToUsername = $username;
+        $this->isExpanded = true;
         $this->dispatch('focusCommentInput');
     }
 
@@ -90,7 +116,7 @@ class CommentSection extends Component
     public function startEdit($commentId, $content)
     {
         $comment = Comment::findOrFail($commentId);
-        
+
         if (!$comment->canEdit()) {
             $this->addError('editingContent', 'You cannot edit this comment.');
             return;
@@ -98,6 +124,8 @@ class CommentSection extends Component
 
         $this->editingCommentId = $commentId;
         $this->editingContent = $content;
+
+        $this->isExpanded = true;
     }
 
     public function updateComment()
@@ -107,18 +135,18 @@ class CommentSection extends Component
         ]);
 
         $comment = Comment::findOrFail($this->editingCommentId);
-        
+
         if (!$comment->canEdit()) {
             $this->addError('editingContent', 'You cannot edit this comment.');
             return;
         }
 
-        $comment->update(['content' => $this->editingContent]);
+        $comment->update(['content' => trim($this->editingContent)]);
 
         $this->editingCommentId = null;
         $this->editingContent = '';
         $this->lastUpdated = now()->timestamp;
-        
+
         session()->flash('message', 'Comment updated successfully!');
     }
 
@@ -131,7 +159,7 @@ class CommentSection extends Component
     public function deleteComment($commentId)
     {
         $comment = Comment::findOrFail($commentId);
-        
+
         if (!$comment->canDelete()) {
             session()->flash('error', 'You cannot delete this comment.');
             return;
@@ -139,9 +167,9 @@ class CommentSection extends Component
 
         $comment->delete();
         $this->lastUpdated = now()->timestamp;
-        
+
         session()->flash('message', 'Comment deleted successfully!');
-        
+
         $this->dispatch('comment-deleted');
     }
 
@@ -162,16 +190,35 @@ class CommentSection extends Component
 
     public function render()
     {
-        $comments = $this->post->comments()
+        $query = $this->post->comments()
             ->approved()
             ->parentOnly()
-            ->with(['user', 'replies.user'])
-            ->orderBy('created_at', 'desc')
-            ->get();
+            ->with(['user', 'replies.user']);
 
-        $totalReplies = $comments->sum(function($comment) {
+
+        switch ($this->sortBy) {
+            case 'oldest':
+                $query->orderBy('created_at', 'asc');
+                break;
+            case 'most_replies':
+                $query->withCount('replies')
+                    ->orderBy('replies_count', 'desc')
+                    ->orderBy('created_at', 'desc'); // Secondary sort by date
+                break;
+            case 'latest':
+            default:
+                $query->orderBy('created_at', 'desc');
+                break;
+        }
+
+        $comments = $query->get();
+        $totalReplies = $comments->sum(function ($comment) {
             return $comment->replies->count();
         });
+
+        if(session()->has('message') || session()->has('error')){
+            $this->isExpanded = true;
+        }
 
         return view('livewire.comment-section', [
             'comments' => $comments,

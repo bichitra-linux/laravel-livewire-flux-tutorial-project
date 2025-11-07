@@ -1,4 +1,4 @@
-<x-layouts.app :title="Comments">
+<x-layouts.app.sidebar :title="Comments">
     <div class="container mx-auto px-4 py-8">
         
         {{-- Header --}}
@@ -425,4 +425,4 @@
         }
     </script>
     @endpush
-</x-layouts.app>
+</x-layouts.app.sidebar>

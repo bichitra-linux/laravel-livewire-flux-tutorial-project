@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use App\Enums\PostStatus;
+use Illuminate\Support\Facades\Auth;
 
 class Post extends Model
 {
@@ -77,7 +78,7 @@ class Post extends Model
     // Check if user has reacted to this post
     public function userReaction($userId = null)
     {
-        $userId = $userId ?? auth()->id();
+        $userId = $userId ?? Auth::id();
         
         // If reactions are loaded, find in collection
         if ($this->relationLoaded('reactions')) {
@@ -90,7 +91,7 @@ class Post extends Model
     // Check if current user has reacted with specific type
     public function hasReaction($type, $userId = null)
     {
-        $userId = $userId ?? auth()->id();
+        $userId = $userId ?? Auth::id();
         return $this->reactions()
             ->where('user_id', $userId)
             ->where('type', $type)

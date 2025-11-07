@@ -25,10 +25,10 @@ Route::get('/posts', [PublicPostController::class, 'index'])->name('public.posts
 Route::get('/posts/{id}', [PublicPostController::class, 'show'])->name('public.posts.show');
 
 // About and Contact pages (Livewire)
-Route::get('/about', function() {
+Route::get('/about', function () {
     return view('about');
 })->name('about');
-Route::get('/contact', function() {
+Route::get('/contact', function () {
     return view('contact');
 })->name('contact');
 
@@ -50,17 +50,24 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth', 'verified', 'admin.only'])->prefix('admin')->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    
+
     // Posts Management
     Route::resource('posts', PostController::class);
 
     // Comments Management
     Route::get('/comments', [CommentController::class, 'index'])->name('comments.index');
-    
+    Route::get('/comments/{comment}', [CommentController::class, 'show'])->name('comments.show');
+    Route::post('/comments/{comment}/approve', [CommentController::class, 'approve'])->name('comments.approve');
+    Route::post('/comments/{comment}/reject', [CommentController::class, 'reject'])->name('comments.reject');
+    Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
+    Route::post('/comments/bulk-approve', [CommentController::class, 'bulkApprove'])->name('comments.bulk-approve');
+    Route::post('/comments/bulk-delete', [CommentController::class, 'bulkDelete'])->name('comments.bulk-delete');
+
+
     // Newsletter Management
     Route::get('/newsletter', [NewsletterController::class, 'index'])->name('newsletter.index');
     Route::get('/newsletter/export', [NewsletterController::class, 'export'])->name('newsletter.export');
-    
+
     // Users Management 
     Route::resource('users', UserController::class)->only(['index', 'show', 'destroy']);
 
@@ -77,9 +84,9 @@ Route::middleware(['auth', 'verified', 'admin.only'])->prefix('admin')->group(fu
 
     Route::get('confirm-password', fn() => view('livewire.auth.confirm-password'))
         ->name('admin.password.confirm');
-    
+
     Route::post('confirm-password', function (Request $request) {
-        if (! Hash::check($request->password, $request->user()->password)) {
+        if (!Hash::check($request->password, $request->user()->password)) {
             return back()->withErrors([
                 'password' => __('The provided password does not match our records.'),
             ]);
@@ -98,7 +105,7 @@ Route::middleware(['auth', 'verified', 'admin.only'])->prefix('admin')->group(fu
         ->middleware(
             when(
                 Features::canManageTwoFactorAuthentication()
-                    && Features::optionEnabled(Features::twoFactorAuthentication(), 'confirmPassword'),
+                && Features::optionEnabled(Features::twoFactorAuthentication(), 'confirmPassword'),
                 ['password.confirm'],
                 [],
             ),
@@ -113,9 +120,9 @@ Route::middleware(['auth', 'verified', 'user.only'])->prefix('user')->group(func
 
     Route::get('confirm-password', fn() => view('livewire.auth.confirm-password'))
         ->name('user.password.confirm');
-    
+
     Route::post('confirm-password', function (Request $request) {
-        if (! Hash::check($request->password, $request->user()->password)) {
+        if (!Hash::check($request->password, $request->user()->password)) {
             return back()->withErrors([
                 'password' => __('The provided password does not match our records.'),
             ]);
@@ -124,7 +131,7 @@ Route::middleware(['auth', 'verified', 'user.only'])->prefix('user')->group(func
         $request->session()->put('auth.password_confirmed_at', time());
         return redirect()->intended();
     })->name('user.password.confirm.store');
-    
+
     // ✅ User Settings (unique names)
     Volt::route('settings/profile', 'user.settings.profile')->name('user.profile.edit');
     Volt::route('settings/password', 'user.settings.password')->name('user.password.edit');
@@ -134,7 +141,7 @@ Route::middleware(['auth', 'verified', 'user.only'])->prefix('user')->group(func
         ->middleware(
             when(
                 Features::canManageTwoFactorAuthentication()
-                    && Features::optionEnabled(Features::twoFactorAuthentication(), 'confirmPassword'),
+                && Features::optionEnabled(Features::twoFactorAuthentication(), 'confirmPassword'),
                 ['password.confirm'],
                 [],
             ),

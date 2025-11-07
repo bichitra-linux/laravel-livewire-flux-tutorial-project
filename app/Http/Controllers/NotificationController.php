@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class NotificationController extends Controller
 {
@@ -11,7 +12,7 @@ class NotificationController extends Controller
      */
     public function index()
     {
-        $notifications = auth()->user()
+        $notifications = Auth::user()
             ->notifications()
             ->paginate(20);
         
@@ -23,7 +24,7 @@ class NotificationController extends Controller
      */
     public function markAsRead($id)
     {
-        $notification = auth()->user()
+        $notification = Auth::user()
             ->notifications()
             ->findOrFail($id);
         
@@ -48,8 +49,8 @@ class NotificationController extends Controller
      */
     public function markAllRead()
     {
-        $count = auth()->user()->unreadNotifications->count();
-        auth()->user()->unreadNotifications->markAsRead();
+        $count = Auth::user()->unreadNotifications->count();
+        Auth::user()->unreadNotifications->markAsRead();
         
         session()->flash('toast', [
             'variant' => 'success',
@@ -65,7 +66,7 @@ class NotificationController extends Controller
      */
     public function destroy($id)
     {
-        $notification = auth()->user()
+        $notification = Auth::user()
             ->notifications()
             ->findOrFail($id);
         
@@ -84,12 +85,12 @@ class NotificationController extends Controller
      */
     public function clearRead()
     {
-        $count = auth()->user()
+        $count = Auth::user()
             ->notifications()
             ->whereNotNull('read_at')
             ->count();
             
-        auth()->user()
+        Auth::user()
             ->notifications()
             ->whereNotNull('read_at')
             ->delete();

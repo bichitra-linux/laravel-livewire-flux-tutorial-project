@@ -46,7 +46,7 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
             'category_id' => 'nullable|exists:categories,id',
@@ -80,10 +80,10 @@ class PostController extends Controller
         }
 
         $post = Auth::user()->posts()->create([
-            'title' => $request->title,
-            'content' => $request->content,
-            'category_id' => $request->category_id,
-            'status' => $request->status ? PostStatus::from($request->status) : PostStatus::Draft,
+            'title' => $validated['title'],
+            'content' => $validated['content'],
+            'category_id' => $validated['category_id'],
+            'status' => $validated['status'] ? PostStatus::from($validated['status']) : PostStatus::Draft,
             'image' => $imagePath,
         ]);
 
@@ -154,7 +154,7 @@ class PostController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $request->validate([
+        $validated = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
             'category_id' => 'nullable|exists:categories,id',
@@ -206,10 +206,10 @@ class PostController extends Controller
         }
 
         $post->update([
-            'title' => $request->title,
-            'content' => $request->content,
-            'category_id' => $request->category_id,
-            'status' => $request->status ? PostStatus::from($request->status) : $post->status,
+            'title' => $validated['title'],
+            'content' => $validated['content'],
+            'category_id' => $validated['category_id'],
+            'status' => $validated['status'] ? PostStatus::from($validated['status']) : $post->status,
             'image' => $imagePath,
         ]);
 

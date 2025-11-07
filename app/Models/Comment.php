@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 
 class Comment extends Model
 {
@@ -57,12 +59,17 @@ class Comment extends Model
     }
 
     public function canEdit($user = null) {
-        $user = $user ?? auth()->user();
+        $user = $user ?? Auth::user();
         return $user && ($user->id === $this->user_id || $user->hasRole(['admin', 'editor']));
     }
 
     public function canDelete($user = null) {
-        $user = $user ?? auth()->user();
+        $user = $user ?? Auth::user();
         return $user && ($user->id === $this->user_id || $user->hasRole(['admin', 'editor']));
     }
+
+    public function getExcerpt($limit = 100)
+{
+    return Str::limit($this->content, $limit);
+}
 }

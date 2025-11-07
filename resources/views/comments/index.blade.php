@@ -1,4 +1,4 @@
-<x-layouts.app.sidebar :title="Comments">
+<x-layouts.app :title="'Comments'">
     <div class="container mx-auto px-4 py-8">
         
         {{-- Header --}}
@@ -158,7 +158,7 @@
         </div>
 
         {{-- Bulk Actions Form --}}
-        <form id="bulkForm" method="POST" class="bg-white dark:bg-zinc-800 rounded-xl shadow-lg overflow-hidden">
+        <form id="bulkForm" method="POST" action="{{ route('comments.bulk-approve') }}" class="bg-white dark:bg-zinc-800 rounded-xl shadow-lg overflow-hidden">
             @csrf
             
             {{-- Bulk Action Bar --}}
@@ -219,7 +219,7 @@
                                 {{-- Author --}}
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-3">
-                                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center shadow-md">
+                                        <div class="w-10 h-10 rounded-full bg-linear-to-br from-blue-500 to-purple-500 flex items-center justify-center shadow-md">
                                             <span class="text-white font-bold text-sm">{{ $comment->user->initials() }}</span>
                                         </div>
                                         <div>
@@ -404,25 +404,27 @@
         }
 
         function bulkAction(action) {
-            const form = document.getElementById('bulkForm');
-            const checkboxes = document.querySelectorAll('.comment-checkbox:checked');
-            
-            if (checkboxes.length === 0) {
-                alert('Please select at least one comment');
-                return;
-            }
+    const form = document.getElementById('bulkForm');
+    const checkboxes = document.querySelectorAll('.comment-checkbox:checked');
+    
+    if (checkboxes.length === 0) {
+        alert('Please select at least one comment');
+        return false;
+    }
 
-            if (action === 'approve') {
-                form.action = '{{ route("comments.bulk-approve") }}';
-            } else if (action === 'delete') {
-                if (!confirm(`Are you sure you want to delete ${checkboxes.length} comment(s)? This action cannot be undone.`)) {
-                    return;
-                }
-                form.action = '{{ route("comments.bulk-delete") }}';
-            }
-
-            form.submit();
+    if (action === 'approve') {
+        form.action = '{{ route("comments.bulk-approve") }}';
+        form.submit();
+    } else if (action === 'delete') {
+        if (!confirm(`Are you sure you want to delete ${checkboxes.length} comment(s)? This action cannot be undone.`)) {
+            return false;
         }
+        form.action = '{{ route("comments.bulk-delete") }}';
+        form.submit();
+    }
+    
+    return false;
+}
     </script>
     @endpush
-</x-layouts.app.sidebar>
+</x-layouts.app>

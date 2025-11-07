@@ -10,6 +10,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Auth;
 
 
 class ReactionController extends Controller
@@ -22,7 +23,7 @@ class ReactionController extends Controller
             'type' => ['required', Rule::enum(ReactionType::class)],
         ]);
 
-        $user = auth()->user();
+        $user = Auth::user();
         $type = $request->type;
 
         // ✅ Rate limiting: 30 reactions per minute
@@ -121,7 +122,7 @@ class ReactionController extends Controller
             })
             ->filter(fn($count) => $count > 0);
 
-        $user = auth()->user();
+        $user = Auth::user();
         $userReaction = $user ? $post->userReaction($user->id) : null;
 
         return [

@@ -7,6 +7,7 @@ use App\Models\Post;
 use App\Models\Comment;
 use Illuminate\Support\Facades\RateLimiter;
 use Livewire\Attributes\On;
+use Illuminate\Support\Facades\Auth;
 
 class CommentSection extends Component
 {
@@ -56,7 +57,7 @@ class CommentSection extends Component
     public function postComment()
     {
         // Rate limiting
-        $key = 'comment:' . auth()->id();
+        $key = 'comment:' . Auth::id();
 
         if (RateLimiter::tooManyAttempts($key, 5)) {
             $seconds = RateLimiter::availableIn($key);
@@ -78,7 +79,7 @@ class CommentSection extends Component
         }
 
         Comment::create([
-            'user_id' => auth()->id(),
+            'user_id' => Auth::id(),
             'post_id' => $this->post->id,
             'parent_id' => $this->parentId,
             'content' => trim($this->content),

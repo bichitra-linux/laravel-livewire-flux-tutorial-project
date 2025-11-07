@@ -26,7 +26,7 @@
                 {{-- Logo --}}
                 <div class="flex items-center">
                     <a href="{{ route('home') }}" class="flex items-center gap-3 hover:opacity-80 transition-opacity duration-200" wire:navigate>
-                        <div class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white flex items-center justify-center font-bold shadow-md">
+                        <div class="w-10 h-10 rounded-full bg-linear-to-r from-blue-500 to-purple-500 text-white flex items-center justify-center font-bold shadow-md">
                             B
                         </div>
                         <div class="hidden sm:block">
@@ -105,7 +105,7 @@
                             <button @click="open = !open" 
                                     @click.away="open = false"
                                     class="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200">
-                                <div class="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white flex items-center justify-center font-semibold text-sm">
+                                <div class="w-8 h-8 rounded-full bg-linear-to-r from-purple-500 to-pink-500 text-white flex items-center justify-center font-semibold text-sm">
                                     {{ $user->initials() }}
                                 </div>
                                 <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" 
@@ -288,8 +288,18 @@
 
     {{-- Scripts --}}
     <script>
-        // Theme Toggle
-        (function () {
+        // Apply theme IMMEDIATELY before page renders (prevents flash)
+        (function() {
+            const theme = localStorage.getItem('theme') || 
+                         (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+            }
+        })();
+
+        // Theme Toggle (After DOM loads)
+        document.addEventListener('DOMContentLoaded', function() {
             const html = document.documentElement;
             const btn = document.getElementById('theme-toggle');
             if (!btn) return;
@@ -299,20 +309,17 @@
 
             function setIcons(isDark) {
                 if (isDark) {
-                    darkIcon.classList.remove('hidden');
-                    lightIcon.classList.add('hidden');
+                    darkIcon?.classList.remove('hidden');
+                    lightIcon?.classList.add('hidden');
                 } else {
-                    lightIcon.classList.remove('hidden');
-                    darkIcon.classList.add('hidden');
+                    lightIcon?.classList.remove('hidden');
+                    darkIcon?.classList.add('hidden');
                 }
             }
 
             const stored = localStorage.getItem('theme');
             const preferDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
             let isDark = stored ? stored === 'dark' : preferDark;
-
-            if (isDark) html.classList.add('dark');
-            else html.classList.remove('dark');
 
             setIcons(isDark);
 
@@ -324,10 +331,10 @@
                 localStorage.setItem('theme', newDark ? 'dark' : 'light');
                 setIcons(newDark);
             });
-        })();
+        });
 
         // Mobile Menu Toggle
-        (function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const toggle = document.getElementById('mobile-menu-toggle');
             const menu = document.getElementById('mobile-menu');
             if (toggle && menu) {
@@ -335,7 +342,7 @@
                     menu.classList.toggle('hidden');
                 });
             }
-        })();
+        });
     </script>
 
     @livewireScripts

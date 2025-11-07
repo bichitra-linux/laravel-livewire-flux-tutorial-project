@@ -56,7 +56,7 @@
                             <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
                                 <div class="flex items-center gap-4">
                                     {{-- User Avatar --}}
-                                    <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 text-white flex items-center justify-center font-bold text-lg">
+                                    <div class="w-12 h-12 rounded-full bg-linear-to-br from-blue-500 to-purple-600 text-white flex items-center justify-center font-bold text-lg">
                                         {{ strtoupper(substr($reaction->user->name, 0, 1)) }}
                                     </div>
                                     

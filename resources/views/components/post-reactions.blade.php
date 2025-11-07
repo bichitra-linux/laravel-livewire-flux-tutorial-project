@@ -125,7 +125,7 @@ class="reaction-container">
         </div>
     @else
         {{-- FULL INTERACTIVE VIEW: For post detail page --}}
-        <div class="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-lg">
+        <div class="bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-lg">
             
             {{-- Header --}}
             <div class="flex items-center justify-between mb-4">

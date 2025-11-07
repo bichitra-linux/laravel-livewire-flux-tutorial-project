@@ -58,7 +58,7 @@
 >
     <div class="flex items-start">
         {{-- Icon --}}
-        <div class="flex-shrink-0">
+        <div class="shrink-0">
             <svg class="h-6 w-6 {{ $config['icon'] }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 {!! $config['icon_svg'] !!}
             </svg>
@@ -80,7 +80,7 @@
         </div>
 
         {{-- Close Button --}}
-        <div class="ml-4 flex-shrink-0 flex">
+        <div class="ml-4 shrink-0 flex">
             <button
                 @click="show = false"
                 class="inline-flex rounded-md {{ $config['icon'] }} hover:opacity-75 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-{{ explode('-', $config['icon'])[1] }}-500"

@@ -163,7 +163,7 @@
                     <div class="mb-8">
                         @if($parentId)
                             <div
-                                class="mb-3 flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl border-2 border-blue-200 dark:border-blue-700">
+                                class="mb-3 flex items-center justify-between p-4 bg-linear-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl border-2 border-blue-200 dark:border-blue-700">
                                 <div class="flex items-center gap-2">
                                     <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor"
                                         viewBox="0 0 24 24">
@@ -214,7 +214,7 @@
                                 <div class="flex gap-2">
                                     <button type="submit" wire:loading.attr="disabled"
                                         wire:loading.class="opacity-50 cursor-not-allowed"
-                                        class="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-400 disabled:to-gray-500 text-white font-semibold rounded-lg transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 active:translate-y-0">
+                                        class="px-6 py-2.5 bg-linear-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-400 disabled:to-gray-500 text-white font-semibold rounded-lg transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 active:translate-y-0">
                                         <span wire:loading.remove wire:target="postComment" class="flex items-center gap-2">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -254,9 +254,9 @@
                     </div>
                 @else
                     <div
-                        class="mb-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl border-2 border-blue-200 dark:border-blue-800">
+                        class="mb-8 p-6 bg-linear-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl border-2 border-blue-200 dark:border-blue-800">
                         <div class="flex items-start gap-4">
-                            <div class="flex-shrink-0 p-3 bg-blue-100 dark:bg-blue-900/40 rounded-full">
+                            <div class="shrink-0 p-3 bg-blue-100 dark:bg-blue-900/40 rounded-full">
                                 <svg class="w-8 h-8 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor"
                                     viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -315,11 +315,11 @@
                                 </div>
 
                                 <div
-                                    class="flex gap-4 p-4 bg-gradient-to-r from-gray-50 to-transparent dark:from-gray-700/50 dark:to-transparent rounded-xl hover:from-gray-100 dark:hover:from-gray-700 transition-all">
+                                    class="flex gap-4 p-4 bg-linear-to-r from-gray-50 to-transparent dark:from-gray-700/50 dark:to-transparent rounded-xl hover:from-gray-100 dark:hover:from-gray-700 transition-all">
                                     {{-- Avatar --}}
-                                    <div class="flex-shrink-0">
+                                    <div class="shrink-0">
                                         <div
-                                            class="w-12 h-12 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-full flex items-center justify-center shadow-lg ring-2 ring-white dark:ring-gray-800">
+                                            class="w-12 h-12 bg-linear-to-br from-blue-500 via-purple-500 to-pink-500 rounded-full flex items-center justify-center shadow-lg ring-2 ring-white dark:ring-gray-800">
                                             <span class="text-white font-bold text-lg">{{ $comment->user->initials() }}</span>
                                         </div>
                                     </div>
@@ -516,9 +516,9 @@
                                                         <div class="flex gap-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
                                                             :class="{ 'ring-2 ring-green-400 dark:ring-green-600': isNewReply }">
                                                             {{-- Reply Avatar --}}
-                                                            <div class="flex-shrink-0">
+                                                            <div class="shrink-0">
                                                                 <div
-                                                                    class="w-10 h-10 bg-gradient-to-br from-green-500 via-teal-500 to-cyan-500 rounded-full flex items-center justify-center shadow-md ring-2 ring-white dark:ring-gray-700">
+                                                                    class="w-10 h-10 bg-linear-to-br from-green-500 via-teal-500 to-cyan-500 rounded-full flex items-center justify-center shadow-md ring-2 ring-white dark:ring-gray-700">
                                                                     <span
                                                                         class="text-white font-bold text-sm">{{ $reply->user->initials() }}</span>
                                                                 </div>

@@ -1,4 +1,4 @@
-<footer class="bg-gradient-to-r from-gray-800 to-gray-900 text-white py-12 mt-auto flex-shrink-0 shadow-lg" role="contentinfo">
+<footer class="bg-linear-to-r from-gray-800 to-gray-900 text-white py-12 mt-auto shrink-0 shadow-lg" role="contentinfo">
     <div class="max-w-7xl mx-auto px-6">
         <div class="grid gap-8 lg:grid-cols-4 md:grid-cols-2">
             <div>

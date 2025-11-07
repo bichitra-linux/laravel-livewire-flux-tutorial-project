@@ -1,6 +1,6 @@
 <x-layouts.app>
     <div
-        class="min-h-screen bg-gradient-to-br from-zinc-50 via-white to-zinc-50 dark:from-zinc-900 dark:via-zinc-800 dark:to-zinc-900 py-12 px-4">
+        class="min-h-screen bg-linear-to-br from-zinc-50 via-white to-zinc-50 dark:from-zinc-900 dark:via-zinc-800 dark:to-zinc-900 py-12 px-4">
         <div class="max-w-5xl mx-auto">
             {{-- Header Section --}}
             <div class="mb-8">
@@ -245,7 +245,7 @@
                             {{-- Action Buttons --}}
                             <div class="space-y-3 pt-4 border-t border-zinc-200 dark:border-zinc-700">
                                 <button type="submit"
-                                    class="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                                    class="w-full flex items-center justify-center gap-2 bg-linear-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M5 13l4 4L19 7"></path>
@@ -264,7 +264,7 @@
 
                             {{-- Tips Card --}}
                             <div
-                                class="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl p-6 border border-blue-200 dark:border-blue-800 mt-8">
+                                class="bg-linear-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl p-6 border border-blue-200 dark:border-blue-800 mt-8">
                                 <div class="flex items-center gap-2 mb-3">
                                     <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none"
                                         stroke="currentColor" viewBox="0 0 24 24">

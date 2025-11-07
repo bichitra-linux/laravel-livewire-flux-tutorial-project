@@ -14,7 +14,7 @@
                 </div>
                 <div class="hidden md:block">
                     <a href="{{ route('posts.create') }}" 
-                        class="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-200 shadow-lg hover:shadow-xl">
+                        class="flex items-center gap-2 bg-linear-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-200 shadow-lg hover:shadow-xl">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                         </svg>
@@ -108,13 +108,13 @@
                                 <div class="flex gap-4">
                                     {{-- Image Thumbnail --}}
                                     @if($post->image)
-                                        <div class="flex-shrink-0">
+                                        <div class="shrink-0">
                                             <img src="{{ asset('storage/' . $post->image) }}" 
                                                 alt="{{ $post->title }}" 
                                                 class="w-32 h-32 object-cover rounded-lg border-2 border-zinc-200 dark:border-zinc-700 group-hover:border-blue-300 dark:group-hover:border-blue-600 transition-colors">
                                         </div>
                                     @else
-                                        <div class="flex-shrink-0 w-32 h-32 rounded-lg bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center">
+                                        <div class="shrink-0 w-32 h-32 rounded-lg bg-linear-to-br from-blue-500 to-purple-500 flex items-center justify-center">
                                             <svg class="w-16 h-16 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                                             </svg>
@@ -246,7 +246,7 @@
                         <h3 class="text-xl font-bold text-zinc-900 dark:text-white mb-2">No posts yet</h3>
                         <p class="text-zinc-600 dark:text-zinc-400 mb-6">Get started by creating your first blog post.</p>
                         <a href="{{ route('posts.create') }}" 
-                            class="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-200">
+                            class="inline-flex items-center gap-2 bg-linear-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-200">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                             </svg>

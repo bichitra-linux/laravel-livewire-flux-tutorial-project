@@ -80,7 +80,7 @@
                         
                         {{-- Unread indicator --}}
                         @if(!$notification->read_at)
-                            <div class="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0"></div>
+                            <div class="w-2 h-2 bg-blue-500 rounded-full shrink-0"></div>
                         @endif
                     </div>
                 </div>

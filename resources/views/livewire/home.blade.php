@@ -46,7 +46,7 @@
                 <div class="lg:col-span-8">
                     @if($posts->isNotEmpty())
                         @php $featured = $posts->first(); @endphp
-                        <article class="relative rounded-xl overflow-hidden shadow-xl bg-gradient-to-r from-white to-gray-100 dark:from-gray-800 dark:to-gray-700 transform hover:scale-101 transition-transform duration-600">
+                        <article class="relative rounded-xl overflow-hidden shadow-xl bg-linear-to-r from-white to-gray-100 dark:from-gray-800 dark:to-gray-700 transform hover:scale-101 transition-transform duration-600">
                             <div class="lg:flex">
                                 {{-- Featured Image (Fixed path) --}}
                                 @if($featured->image)
@@ -129,7 +129,7 @@
                                         <div class="flex items-start gap-3">
                                             @if($p->image)
                                                 <img src="{{ asset('storage/' . $p->image) }}" alt="{{ $p->title }}" 
-                                                    class="w-12 h-12 object-cover rounded-md flex-shrink-0">
+                                                    class="w-12 h-12 object-cover rounded-md shrink-0">
                                             @endif
                                             <div class="flex-1">
                                                 <div class="font-medium line-clamp-2">{{ $p->title }}</div>
@@ -219,7 +219,7 @@
         @error('email')
             <p class="text-xs text-red-600 dark:text-red-400">{{ $message }}</p>
         @enderror
-        <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-3 rounded-lg font-semibold shadow-md transition-all duration-200">
+        <button type="submit" class="w-full bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-3 rounded-lg font-semibold shadow-md transition-all duration-200">
             Subscribe
         </button>
     </form>

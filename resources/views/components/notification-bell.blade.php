@@ -15,7 +15,7 @@
         </svg>
         
         @if($unreadCount > 0)
-            <span class="absolute -top-1 -right-1 flex items-center justify-center min-w-[1.25rem] h-5 px-1 text-xs font-bold text-white bg-red-500 rounded-full">
+            <span class="absolute -top-1 -right-1 flex items-center justify-center min-w-5 h-5 px-1 text-xs font-bold text-white bg-red-500 rounded-full">
                 {{ $unreadCount > 9 ? '9+' : $unreadCount }}
             </span>
         @endif
@@ -101,13 +101,13 @@
                 >
                     <div class="flex items-start gap-3">
                         {{-- Icon --}}
-                        <div class="flex-shrink-0 text-3xl">
+                        <div class="shrink-0 text-3xl">
                             {{ $icon }}
                         </div>
                         
                         {{-- Content --}}
                         <div class="flex-1 min-w-0">
-                            <p class="text-sm font-medium text-zinc-900 dark:text-zinc-100 break-words">
+                            <p class="text-sm font-medium text-zinc-900 dark:text-zinc-100 wrap-break-word">
                                 {{ $data['message'] }}
                             </p>
                             <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
@@ -150,7 +150,7 @@
                         
                         {{-- Unread Indicator --}}
                         @if(!$notification->read_at)
-                            <div class="flex-shrink-0 pt-1">
+                            <div class="shrink-0 pt-1">
                                 <span class="w-2.5 h-2.5 bg-blue-500 rounded-full block"></span>
                             </div>
                         @endif

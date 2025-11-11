@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Category;
+use Illuminate\Support\Str;
 
 class CategorySeeder extends Seeder
 {
@@ -13,19 +13,48 @@ class CategorySeeder extends Seeder
      */
     public function run(): void
     {
-        //
-        $items = [
-
-        ['name' => 'Politics', 'slug' => 'politics'],
-        ['name' => 'Tech', 'slug' => 'tech'],
-        ['name' => 'Culture', 'slug' => 'culture'],
-        ['name' => 'Business', 'slug' => 'business'],
-        ['name' => 'World', 'slug' => 'world'],
-
+        $categories = [
+            [
+                'name' => 'Politics',
+                'slug' => 'politics',
+            ],
+            [
+                'name' => 'Technology',
+                'slug' => 'technology',
+            ],
+            [
+                'name' => 'Culture',
+                'slug' => 'culture',
+            ],
+            [
+                'name' => 'Business',
+                'slug' => 'business',
+            ],
+            [
+                'name' => 'World',
+                'slug' => 'world',
+            ],
+            [
+                'name' => 'Science',
+                'slug' => 'science',
+            ],
+            [
+                'name' => 'Health',
+                'slug' => 'health',
+            ],
+            [
+                'name' => 'Sports',
+                'slug' => 'sports',
+            ],
         ];
 
-        foreach ($items as $it) {
-            Category::firstOrCreate(['slug' => $it['slug']], $it);
+        foreach ($categories as $category) {
+            Category::firstOrCreate(
+                ['slug' => $category['slug']],
+                $category
+            );
         }
+
+        $this->command->info('✅ Successfully created ' . count($categories) . ' categories!');
     }
 }

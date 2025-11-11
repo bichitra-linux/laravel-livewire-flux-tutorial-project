@@ -36,29 +36,18 @@
                     </a>
                 </div>
 
-                {{-- Desktop Navigation --}}
-                <nav class="hidden md:flex items-center space-x-6">
-                    <a href="{{ route('public.posts.index') }}" 
-                       class="text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 font-medium"
-                       wire:navigate>
-                        All Posts
-                    </a>
-                    <a href="{{ route('public.posts.index', ['category' => 'politics']) }}" 
-                       class="text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 font-medium"
-                       wire:navigate>
-                        Politics
-                    </a>
-                    <a href="{{ route('public.posts.index', ['category' => 'tech']) }}" 
-                       class="text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 font-medium"
-                       wire:navigate>
-                        Tech
-                    </a>
-                    <a href="{{ route('public.posts.index', ['category' => 'culture']) }}" 
-                       class="text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 font-medium"
-                       wire:navigate>
-                        Culture
-                    </a>
-                </nav>
+                {{-- Weather Forecast Widget (Integrated) --}}
+                <div id="weather-widget" class="hidden lg:flex items-center gap-4">
+                    <div id="weather-loading" class="flex items-center gap-2 text-gray-500 dark:text-gray-400">
+                        <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        {{-- <span class="text-xs">Loading...</span>--}}
+                    </div>
+                    <div id="weather-content" class="flex items-center gap-4"></div>
+                    <div id="weather-error" class="hidden text-xs text-red-600 dark:text-red-400"></div>
+                </div>
 
                 {{-- Right Side Actions --}}
                 <div class="flex items-center gap-3">
@@ -86,19 +75,9 @@
                     @auth
                         @php
                             $user = auth()->user();
-                            // ✅ Same logic as middleware
                             $isAdmin = $user->hasAnyRole(['admin', 'editor', 'writer']);
                             $isRegularUser = $user->hasRole('user') && !$user->hasAnyRole(['admin', 'editor', 'writer']);
                         @endphp
-
-                        <!--@if($isAdmin)
-                            {{-- Admin: Dashboard Button --}}
-                            <a href="{{ route('dashboard') }}" 
-                               class="hidden sm:inline-flex px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors duration-200 shadow-sm"
-                               wire:navigate>
-                                Dashboard
-                            </a>
-                        @endif -->
 
                         {{-- User Menu Dropdown --}}
                         <div class="relative" x-data="{ open: false }">
@@ -204,26 +183,10 @@
             {{-- Mobile Menu --}}
             <div id="mobile-menu" class="md:hidden hidden border-t border-gray-200 dark:border-gray-700 py-4">
                 <nav class="flex flex-col space-y-2">
-                    <a href="{{ route('public.posts.index') }}" 
-                       class="px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
-                       wire:navigate>
-                        All Posts
-                    </a>
-                    <a href="{{ route('public.posts.index', ['category' => 'politics']) }}" 
-                       class="px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
-                       wire:navigate>
-                        Politics
-                    </a>
-                    <a href="{{ route('public.posts.index', ['category' => 'tech']) }}" 
-                       class="px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
-                       wire:navigate>
-                        Tech
-                    </a>
-                    <a href="{{ route('public.posts.index', ['category' => 'culture']) }}" 
-                       class="px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
-                       wire:navigate>
-                        Culture
-                    </a>
+                    {{-- Mobile Weather Widget --}}
+                    <div id="weather-widget-mobile" class="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+                        <div id="weather-mobile-content"></div>
+                    </div>
 
                     @auth
                         @php
@@ -298,6 +261,162 @@
             }
         })();
 
+        // Weather Forecast Function
+        async function fetchWeather() {
+            const widget = document.getElementById('weather-widget');
+            const loading = document.getElementById('weather-loading');
+            const content = document.getElementById('weather-content');
+            const error = document.getElementById('weather-error');
+            const mobileContent = document.getElementById('weather-mobile-content');
+
+            try {
+                // Get user location
+                const position = await new Promise((resolve, reject) => {
+                    navigator.geolocation.getCurrentPosition(resolve, reject);
+                });
+
+                const { latitude, longitude } = position.coords;
+                
+                // Fetch location name using reverse geocoding (OpenStreetMap Nominatim)
+                let locationName = 'Your Location';
+                try {
+                    const geoResponse = await fetch(
+                        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=10`,
+                        {
+                            headers: {
+                                'User-Agent': navigator.userAgent
+                            }
+                        }
+                    );
+                    
+                    if (geoResponse.ok) {
+                        const geoData = await geoResponse.json();
+                        // Get city, town, or village name
+                        locationName = geoData.address.city || 
+                                      geoData.address.town || 
+                                      geoData.address.village || 
+                                      geoData.address.county || 
+                                      'Your Location';
+                    }
+                } catch (geoErr) {
+                    console.warn('Location name fetch failed:', geoErr);
+                }
+                
+                // Fetch weather data from MET Norway API
+                const response = await fetch(
+                    `https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=${latitude}&lon=${longitude}`,
+                    {
+                        headers: {
+                            'User-Agent': navigator.userAgent
+                        }
+                    }
+                );
+
+                if (!response.ok) throw new Error('Weather API request failed');
+
+                const data = await response.json();
+                const timeseries = data.properties.timeseries;
+
+                // Get forecast for next 4 days (at noon each day)
+                const forecasts = [];
+                const today = new Date();
+                
+                for (let i = 0; i < 4; i++) {
+                    const targetDate = new Date(today);
+                    targetDate.setDate(today.getDate() + i);
+                    targetDate.setHours(12, 0, 0, 0);
+
+                    // Find closest forecast to noon
+                    const forecast = timeseries.find(t => {
+                        const forecastDate = new Date(t.time);
+                        return forecastDate.getDate() === targetDate.getDate() &&
+                               forecastDate.getHours() === 12;
+                    }) || timeseries[i * 8]; // Fallback to every 8th entry
+
+                    if (forecast) {
+                        forecasts.push({
+                            date: targetDate,
+                            data: forecast.data.instant.details,
+                            symbol: forecast.data.next_6_hours?.summary.symbol_code || 
+                                   forecast.data.next_1_hours?.summary.symbol_code
+                        });
+                    }
+                }
+
+                // Weather icon mapping
+                const getWeatherIcon = (symbol) => {
+                    if (!symbol) return '☁️';
+                    if (symbol.includes('clear')) return '☀️';
+                    if (symbol.includes('cloudy')) return '⛅';
+                    if (symbol.includes('rain')) return '🌧️';
+                    if (symbol.includes('snow')) return '❄️';
+                    if (symbol.includes('thunder')) return '⛈️';
+                    return '☁️';
+                };
+
+                // Render desktop forecast
+                const desktopHTML = `
+                    <div class="flex items-center gap-2 px-3 border-r border-gray-200 dark:border-gray-700">
+                        <svg class="w-4 h-4 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                        <span class="text-xs font-medium text-gray-600 dark:text-gray-400">${locationName}</span>
+                    </div>
+                    ${forecasts.map((f, i) => `
+                        <div class="flex items-center gap-2 px-2 border-r border-gray-200 dark:border-gray-700 last:border-r-0">
+                            <span class="text-lg">${getWeatherIcon(f.symbol)}</span>
+                            <div class="flex flex-col">
+                                <span class="text-xs text-gray-500 dark:text-gray-400 leading-none">
+                                    ${i === 0 ? 'Today' : f.date.toLocaleDateString('en-US', { weekday: 'short' })}
+                                </span>
+                                <span class="text-sm font-semibold text-gray-900 dark:text-white leading-none mt-0.5">
+                                    ${Math.round(f.data.air_temperature)}°C
+                                </span>
+                            </div>
+                        </div>
+                    `).join('')}
+                `;
+
+                // Render mobile forecast
+                const mobileHTML = `
+                    <div class="flex items-center gap-2 mb-3">
+                        <svg class="w-4 h-4 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                        <div class="text-sm font-medium text-gray-700 dark:text-gray-300">Today in ${locationName}</div>
+                    </div>
+                    <div class="grid grid-cols-4 gap-3">
+                        ${forecasts.map((f, i) => `
+                            <div class="flex flex-col items-center">
+                                <span class="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                                    ${i === 0 ? 'Today' : f.date.toLocaleDateString('en-US', { weekday: 'short' })}
+                                </span>
+                                <span class="text-xl mb-1">${getWeatherIcon(f.symbol)}</span>
+                                <span class="text-xs font-semibold text-gray-900 dark:text-white">
+                                    ${Math.round(f.data.air_temperature)}°
+                                </span>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+
+                loading.classList.add('hidden');
+                content.innerHTML = desktopHTML;
+                content.classList.remove('hidden');
+                mobileContent.innerHTML = mobileHTML;
+                widget.classList.remove('hidden');
+
+            } catch (err) {
+                console.error('Weather fetch error:', err);
+                loading.classList.add('hidden');
+                error.textContent = 'Unable to load weather';
+                error.classList.remove('hidden');
+                widget.classList.remove('hidden');
+            }
+        }
+
         // Theme Toggle (After DOM loads)
         document.addEventListener('DOMContentLoaded', function() {
             const html = document.documentElement;
@@ -331,6 +450,9 @@
                 localStorage.setItem('theme', newDark ? 'dark' : 'light');
                 setIcons(newDark);
             });
+
+            // Fetch weather on page load
+            fetchWeather();
         });
 
         // Mobile Menu Toggle

@@ -71,9 +71,12 @@ class DashboardController extends Controller
         // Top Post (most engaged in last 7 days)
         $topPost = $user->posts()
             ->where('status', PostStatus::Published)
-            ->withCount(['reactions', 'comments'])
             ->where('created_at', '>=', now()->subWeek())
-            ->orderByRaw('(reactions_count + comments_count) DESC')
+            ->withCount(['reactions', 'comments'])
+            ->get()
+            ->sortByDesc(function($post) {
+                return $post->reactions_count + $post->comments_count;
+            })
             ->first();
 
         // Engagement Rate

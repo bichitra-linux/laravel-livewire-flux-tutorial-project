@@ -20,17 +20,33 @@ class PostController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Post::with('user', 'category', 'tags')->latestPosts();
+    $query = Post::with('user', 'category', 'tags')->latestPosts();
 
-        if ($request->filled('category')) {
-            $cat = Category::where('slug', $request->category)->orWhere('id', $request->category)->first();
-            if ($cat)
-                $query->where('category_id', $cat->id);
-
+    $selectedCategory = null;
+    if ($request->filled('category')) {
+        // Separate queries based on whether value is numeric
+        if (is_numeric($request->category)) {
+            // If numeric, it could be either id or slug like "123"
+            $selectedCategory = Category::where('id', $request->category)->first();
+            
+            // If not found by id, try slug
+            if (!$selectedCategory) {
+                $selectedCategory = Category::where('slug', $request->category)->first();
+            }
+        } else {
+            // If string, only search by slug
+            $selectedCategory = Category::where('slug', $request->category)->first();
         }
-        $posts = $query->paginate(10);
-        return view('posts.index', compact('posts'));
+
+        if ($selectedCategory) {
+            $query->where('category_id', $selectedCategory->id);
+        }
     }
+    
+    $posts = $query->paginate(10);
+    
+    return view('posts.index', compact('posts', 'selectedCategory'));
+}
 
     /**
      * Show the form for creating a new resource.
@@ -46,7 +62,7 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        $validated = Request::validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
             'category_id' => 'nullable|exists:categories,id',
@@ -57,23 +73,23 @@ class PostController extends Controller
 
         // Handle image upload with resize (v3 syntax)
         $imagePath = null;
-        if ($request->hasFile('image')) {
-            $image = $request->file('image');
+        if (Request::hasFile('image')) {
+            $image = Request::file('image');
             $filename = time() . '_' . Str::slug(pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $image->getClientOriginalExtension();
-            
+
             // Create ImageManager with GD driver
             $manager = new Image(new Driver());
-            
+
             // Read and resize image
             $img = $manager->read($image->getRealPath());
             $img->cover(1920, 1080); // Resize to 1920x1080 (cover = fit + crop)
-            
+
             // Ensure directory exists
             $directory = storage_path('app/public/posts');
             if (!file_exists($directory)) {
                 mkdir($directory, 0755, true);
             }
-            
+
             // Save to storage
             $img->save($directory . '/' . $filename, quality: 85);
             $imagePath = 'posts/' . $filename;
@@ -88,7 +104,7 @@ class PostController extends Controller
         ]);
 
         // Handle tags
-        if ($request->filled('tags')) {
+        if (Request::filled('tags')) {
             $tagNames = array_map('trim', explode(',', $request->tags));
             $tagIds = [];
 
@@ -154,7 +170,7 @@ class PostController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $validated = $request->validate([
+        $validated = Request::validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
             'category_id' => 'nullable|exists:categories,id',
@@ -168,38 +184,38 @@ class PostController extends Controller
 
         // Handle image upload
         $imagePath = $post->image;
-        
+
         // Remove image if checkbox is checked
-        if ($request->has('remove_image') && $request->remove_image == '1') {
+        if (Request::has('remove_image') && $request->remove_image == '1') {
             if ($post->image && Storage::disk('public')->exists($post->image)) {
                 Storage::disk('public')->delete($post->image);
             }
             $imagePath = null;
         }
-        
+
         // Upload new image with resize (v3 syntax)
-        if ($request->hasFile('image')) {
+        if (Request::hasFile('image')) {
             // Delete old image if exists
             if ($post->image && Storage::disk('public')->exists($post->image)) {
                 Storage::disk('public')->delete($post->image);
             }
-            
-            $image = $request->file('image');
+
+            $image = Request::file('image');
             $filename = time() . '_' . Str::slug(pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $image->getClientOriginalExtension();
-            
+
             // Create ImageManager with GD driver
             $manager = new Image(new Driver());
-            
+
             // Read and resize image
             $img = $manager->read($image->getRealPath());
             $img->cover(1920, 1080); // Resize to 1920x1080
-            
+
             // Ensure directory exists
             $directory = storage_path('app/public/posts');
             if (!file_exists($directory)) {
                 mkdir($directory, 0755, true);
             }
-            
+
             // Save to storage
             $img->save($directory . '/' . $filename, quality: 85);
             $imagePath = 'posts/' . $filename;
@@ -214,7 +230,7 @@ class PostController extends Controller
         ]);
 
         // Handle tags
-        if ($request->filled('tags')) {
+        if (Request::filled('tags')) {
             $tagNames = array_map('trim', explode(',', $request->tags));
             $tagIds = [];
 

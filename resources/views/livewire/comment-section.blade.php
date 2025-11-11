@@ -117,7 +117,7 @@
                             <span wire:loading wire:target="refreshComments">Refreshing...</span>
                         </button>
 
-                        
+
                     </div>
                 </div>
 
@@ -234,7 +234,7 @@
                                     @endif
                                 </div>
 
-                                
+
                             </div>
                         </form>
                     </div>
@@ -282,19 +282,19 @@
 
                 {{-- Comments List with Threading --}}
                 <div class="space-y-6" wire:key="comments-list-{{ $lastUpdated }}" x-data="{ 
-                             threadsExpanded: @entangle('allThreadsExpanded').live 
-                         }" @threads-collapsed.window="threadsExpanded = false"
+                                 threadsExpanded: @entangle('allThreadsExpanded').live 
+                             }" @threads-collapsed.window="threadsExpanded = false"
                     @threads-expanded.window="threadsExpanded = true">
                     @forelse($comments as $comment)
                         <div x-data="{ 
-                                        expanded: threadsExpanded,
-                                        isNew: {{ $comment->created_at->gt(now()->subMinutes(5)) ? 'true' : 'false' }}
-                                    }" class="comment-item" id="comment-{{ $comment->id }}"
+                                                expanded: threadsExpanded,
+                                                isNew: {{ $comment->created_at->gt(now()->subMinutes(5)) ? 'true' : 'false' }}
+                                            }" class="comment-item" id="comment-{{ $comment->id }}"
                             wire:key="comment-{{ $comment->id }}">
 
                             {{-- Parent Comment --}}
                             <div class="relative" :class="{ 'ring-2 ring-blue-400 dark:ring-blue-600 rounded-xl': isNew }">
-                                
+
 
                                 <div
                                     class="flex gap-4 p-4 bg-linear-to-r from-gray-50 to-transparent dark:from-gray-700/50 dark:to-transparent rounded-xl hover:from-gray-100 dark:hover:from-gray-700 transition-all">
@@ -435,7 +435,8 @@
                                                 {{-- Comment Content --}}
                                                 <div class="prose prose-sm dark:prose-invert max-w-none mb-3">
                                                     <p class="text-gray-700 dark:text-gray-300 leading-relaxed">
-                                                        {{ preg_replace('/^\s+|\s+$/u', '', $comment->content) }}</p>
+                                                        {{ preg_replace('/^\s+|\s+$/u', '', $comment->content) }}
+                                                    </p>
                                                 </div>
 
                                                 {{-- Comment Actions --}}
@@ -484,12 +485,12 @@
                                                 @foreach($comment->replies as $reply)
                                                     <div x-data="{ isNewReply: {{ $reply->created_at->gt(now()->subMinutes(5)) ? 'true' : 'false' }} }"
                                                         class="relative" wire:key="reply-{{ $reply->id }}">
-                                                        {{-- Thread Connection Line 
+                                                        {{-- Thread Connection Line
                                                         <div
                                                             class="absolute -left-4 sm:-left-6 top-6 w-4 sm:w-6 h-0.5 bg-blue-200 dark:bg-blue-800">
                                                         </div>
---}}
-                                                        
+                                                        --}}
+
 
                                                         <div class="flex gap-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
                                                             :class="{ 'ring-2 ring-green-400 dark:ring-green-600': isNewReply }">
@@ -602,9 +603,9 @@
                                                                                 @endif
                                                                             @endauth
                                                                         </div>
-                                                                        <p
-                                                                            class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
-                                                                            {{ preg_replace('/^\s+|\s+$/u', '', $reply->content) }}</p>
+                                                                        <p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                                                                            {{ preg_replace('/^\s+|\s+$/u', '', $reply->content) }}
+                                                                        </p>
                                                                     </div>
                                                                 @endif
                                                             </div>

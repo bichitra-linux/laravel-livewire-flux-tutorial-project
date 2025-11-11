@@ -117,15 +117,7 @@
                             <span wire:loading wire:target="refreshComments">Refreshing...</span>
                         </button>
 
-                        {{-- Close Button --}}
-                        <button wire:click="toggleSection"
-                            class="p-2 text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                            title="Close Comments">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M6 18L18 6M6 6l12 12"></path>
-                            </svg>
-                        </button>
+                        
                     </div>
                 </div>
 
@@ -242,13 +234,7 @@
                                     @endif
                                 </div>
 
-                                <p class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                    </svg>
-                                    Markdown supported
-                                </p>
+                                
                             </div>
                         </form>
                     </div>
@@ -308,11 +294,7 @@
 
                             {{-- Parent Comment --}}
                             <div class="relative" :class="{ 'ring-2 ring-blue-400 dark:ring-blue-600 rounded-xl': isNew }">
-                                {{-- New Comment Badge --}}
-                                <div x-show="isNew" x-transition
-                                    class="absolute -top-2 -right-2 px-2 py-1 bg-blue-600 text-white text-xs font-bold rounded-full shadow-lg animate-pulse z-10">
-                                    NEW
-                                </div>
+                                
 
                                 <div
                                     class="flex gap-4 p-4 bg-linear-to-r from-gray-50 to-transparent dark:from-gray-700/50 dark:to-transparent rounded-xl hover:from-gray-100 dark:hover:from-gray-700 transition-all">
@@ -502,16 +484,12 @@
                                                 @foreach($comment->replies as $reply)
                                                     <div x-data="{ isNewReply: {{ $reply->created_at->gt(now()->subMinutes(5)) ? 'true' : 'false' }} }"
                                                         class="relative" wire:key="reply-{{ $reply->id }}">
-                                                        {{-- Thread Connection Line --}}
+                                                        {{-- Thread Connection Line 
                                                         <div
                                                             class="absolute -left-4 sm:-left-6 top-6 w-4 sm:w-6 h-0.5 bg-blue-200 dark:bg-blue-800">
                                                         </div>
-
-                                                        {{-- New Reply Badge --}}
-                                                        <div x-show="isNewReply" x-transition
-                                                            class="absolute -top-2 -right-2 px-1.5 py-0.5 bg-green-600 text-white text-xs font-bold rounded-full shadow-lg animate-pulse z-10">
-                                                            NEW
-                                                        </div>
+--}}
+                                                        
 
                                                         <div class="flex gap-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
                                                             :class="{ 'ring-2 ring-green-400 dark:ring-green-600': isNewReply }">

@@ -93,13 +93,13 @@
                 <div class="flex items-center">
                     <a href="{{ route('home') }}" class="group flex items-center gap-4" wire:navigate>
                         <div class="relative">
-                            <div class="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl blur opacity-40 group-hover:opacity-60 transition-opacity"></div>
-                            <div class="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow duration-300">
+                            <div class="absolute inset-0 bg-linear-to-r from-blue-600 to-purple-600 rounded-2xl blur opacity-40 group-hover:opacity-60 transition-opacity"></div>
+                            <div class="relative w-14 h-14 rounded-2xl bg-linear-to-br from-blue-600 via-purple-600 to-pink-600 flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow duration-300">
                                 <span class="text-2xl font-black text-white">B</span>
                             </div>
                         </div>
                         <div class="hidden sm:block">
-                            <h1 class="text-2xl font-black text-gray-900 dark:text-white tracking-tight group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-blue-600 group-hover:to-purple-600 group-hover:bg-clip-text transition-all duration-300">
+                            <h1 class="text-2xl font-black text-gray-900 dark:text-white tracking-tight group-hover:text-transparent group-hover:bg-linear-to-r group-hover:from-blue-600 group-hover:to-purple-600 group-hover:bg-clip-text transition-all duration-300">
                                 {{ $title ?? 'The Brief' }}
                             </h1>
                             <p class="text-xs text-gray-500 dark:text-gray-400 font-medium tracking-wider uppercase">
@@ -180,7 +180,7 @@
                                     @click.away="open = false"
                                     class="flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 group">
                                 <div class="relative">
-                                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 via-pink-500 to-red-500 flex items-center justify-center text-white font-bold shadow-md group-hover:shadow-lg transition-shadow">
+                                    <div class="w-10 h-10 rounded-xl bg-linear-to-br from-purple-500 via-pink-500 to-red-500 flex items-center justify-center text-white font-bold shadow-md group-hover:shadow-lg transition-shadow">
                                         {{ $user->initials() }}
                                     </div>
                                     <div class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white dark:border-gray-900 rounded-full"></div>
@@ -212,10 +212,10 @@
                                  style="display: none;">
                                 
                                 {{-- User Info Card --}}
-                                <div class="p-5 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border-b border-gray-200 dark:border-gray-700">
+                                <div class="p-5 bg-linear-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border-b border-gray-200 dark:border-gray-700">
                                     <div class="flex items-center gap-4">
                                         <div class="relative">
-                                            <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-500 via-pink-500 to-red-500 flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                                            <div class="w-14 h-14 rounded-xl bg-linear-to-br from-purple-500 via-pink-500 to-red-500 flex items-center justify-center text-white font-bold text-lg shadow-lg">
                                                 {{ $user->initials() }}
                                             </div>
                                             <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 border-3 border-white dark:border-gray-800 rounded-full"></div>
@@ -295,7 +295,7 @@
                         <div class="hidden md:flex items-center gap-3">
                             @if (Route::has('register'))
                                 <a href="{{ route('register') }}" 
-                                   class="inline-flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-xl shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105">
+                                   class="inline-flex items-center gap-2 px-6 py-2.5 bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-xl shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
                                     </svg>
@@ -325,7 +325,7 @@
         <div id="mobile-menu" class="lg:hidden hidden border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
             <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-2">
                 {{-- Mobile Weather --}}
-                <div id="weather-widget-mobile" class="mb-4 p-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl border border-gray-200 dark:border-gray-700 transition-opacity duration-300">
+                <div id="weather-widget-mobile" class="mb-4 p-4 bg-linear-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl border border-gray-200 dark:border-gray-700 transition-opacity duration-300">
                     <div id="weather-mobile-content" class="text-sm"></div>
                 </div>
 
@@ -380,10 +380,10 @@
 
                     {{-- User Section --}}
                     <div class="pt-4 border-t border-gray-200 dark:border-gray-700 mt-4">
-                        <div class="p-4 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl mb-3">
+                        <div class="p-4 bg-linear-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl mb-3">
                             <div class="flex items-center gap-4">
                                 <div class="relative">
-                                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 via-pink-500 to-red-500 flex items-center justify-center text-white font-bold shadow-lg">
+                                    <div class="w-12 h-12 rounded-xl bg-linear-to-br from-purple-500 via-pink-500 to-red-500 flex items-center justify-center text-white font-bold shadow-lg">
                                         {{ $user->initials() }}
                                     </div>
                                     <div class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white dark:border-gray-900 rounded-full"></div>
@@ -455,7 +455,7 @@
                         </a>
                         @if (Route::has('register'))
                             <a href="{{ route('register') }}" 
-                               class="flex items-center justify-center gap-2 w-full px-6 py-4 text-base font-semibold text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-xl shadow-lg transition-all">
+                               class="flex items-center justify-center gap-2 w-full px-6 py-4 text-base font-semibold text-white bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-xl shadow-lg transition-all">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
                                 </svg>

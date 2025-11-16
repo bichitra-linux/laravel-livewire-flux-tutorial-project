@@ -62,7 +62,7 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = Request::validate([
+        $validated = $request->validate([  // Fixed: Use instance method
             'title' => 'required|string|max:255',
             'content' => 'required|string',
             'category_id' => 'nullable|exists:categories,id',
@@ -73,8 +73,8 @@ class PostController extends Controller
 
         // Handle image upload with resize (v3 syntax)
         $imagePath = null;
-        if (Request::hasFile('image')) {
-            $image = Request::file('image');
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
             $filename = time() . '_' . Str::slug(pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $image->getClientOriginalExtension();
 
             // Create ImageManager with GD driver
@@ -104,19 +104,20 @@ class PostController extends Controller
         ]);
 
         // Handle tags
-        if (Request::filled('tags')) {
+        if ($request->filled('tags')) {
             $tagNames = array_map('trim', explode(',', $request->tags));
             $tagIds = [];
 
             foreach ($tagNames as $tagName) {
-                if (!empty($tagName)) {
-                    $tag = Tag::firstOrCreate(
-                        ['name' => $tagName],
-                        ['slug' => Str::slug($tagName)]
-                    );
-                    $tagIds[] = $tag->id;
-                }
+            if (!empty($tagName)) {
+                $slug = Str::slug($tagName);
+                $tag = Tag::firstOrCreate(
+                    ['slug' => $slug],  // Use slug as unique key
+                    ['name' => $tagName]
+                );
+                $tagIds[] = $tag->id;
             }
+        }
 
             $post->tags()->sync($tagIds);
         }
@@ -170,7 +171,7 @@ class PostController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $validated = Request::validate([
+        $validated = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
             'category_id' => 'nullable|exists:categories,id',
@@ -186,7 +187,7 @@ class PostController extends Controller
         $imagePath = $post->image;
 
         // Remove image if checkbox is checked
-        if (Request::has('remove_image') && $request->remove_image == '1') {
+        if ($request->has('remove_image') && $request->remove_image == '1') {
             if ($post->image && Storage::disk('public')->exists($post->image)) {
                 Storage::disk('public')->delete($post->image);
             }
@@ -194,13 +195,13 @@ class PostController extends Controller
         }
 
         // Upload new image with resize (v3 syntax)
-        if (Request::hasFile('image')) {
+        if ($request->hasFile('image')) {
             // Delete old image if exists
             if ($post->image && Storage::disk('public')->exists($post->image)) {
                 Storage::disk('public')->delete($post->image);
             }
 
-            $image = Request::file('image');
+            $image = $request->file('image');
             $filename = time() . '_' . Str::slug(pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $image->getClientOriginalExtension();
 
             // Create ImageManager with GD driver
@@ -230,7 +231,7 @@ class PostController extends Controller
         ]);
 
         // Handle tags
-        if (Request::filled('tags')) {
+        if ($request->filled('tags')) {
             $tagNames = array_map('trim', explode(',', $request->tags));
             $tagIds = [];
 

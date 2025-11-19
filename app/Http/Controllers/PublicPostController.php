@@ -66,11 +66,15 @@ class PublicPostController extends Controller
         return view('posts.public', compact('posts', 'categories'));
     }
 
-    public function show($id)
+    public function show(Post $post)
     {
-        $post = Post::with('user', 'category', 'tags', 'reactions')
-            ->where('status', PostStatus::Published)
-            ->findOrFail($id);
+        // Check if post is published
+        if ($post->status !== PostStatus::Published) {
+            abort(404);
+        }
+
+        // Load relationships
+        $post->load('user', 'category', 'tags', 'reactions');
 
         // Track view with cookie to prevent multiple counts from same user
         $cookieName = 'post_' . $post->id . '_viewed';

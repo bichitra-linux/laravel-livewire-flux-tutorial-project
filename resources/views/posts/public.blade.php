@@ -212,7 +212,7 @@
                                 
                                 {{-- Title --}}
                                 <h3 class="font-bold text-xl text-gray-900 dark:text-white mb-3 leading-tight line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200">
-                                    <a href="{{ route('public.posts.show', $post) }}">
+                                    <a href="{{ route('public.posts.show', $post->slug) }}">
                                         {{ $post->title }}
                                     </a>
                                 </h3>
@@ -236,7 +236,7 @@
                                 
                                 {{-- Footer --}}
                                 <div class="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-700">
-                                    <a href="{{ route('public.posts.show', $post) }}"
+                                    <a href="{{ route('public.posts.show', $post->slug) }}"
                                         class="inline-flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 font-semibold text-sm group/link">
                                         Read Article
                                         <svg class="w-4 h-4 group-hover/link:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">

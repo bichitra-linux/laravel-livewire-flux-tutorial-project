@@ -236,7 +236,7 @@
                                     @endif
                                     <div class="p-4">
                                         <h3 class="font-semibold text-lg text-gray-900 dark:text-white mb-2">
-                                            <a href="{{ route('public.posts.show', $rel) }}"
+                                            <a href="{{ route('public.posts.show', $rel->slug) }}"
                                                 class="hover:text-blue-600 dark:hover:text-blue-400">
                                                 {{ $rel->title }}
                                             </a>
@@ -295,7 +295,7 @@
                         <ul class="space-y-3">
                             @foreach($popular as $pop)
                                 <li>
-                                    <a href="{{ route('public.posts.show', $pop) }}"
+                                    <a href="{{ route('public.posts.show', $pop->slug) }}"
                                         class="text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 font-medium">
                                         {{ $pop->title }}
                                     </a>

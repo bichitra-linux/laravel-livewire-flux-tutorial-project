@@ -17,6 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'user.only' => \App\Http\Middleware\UserOnly::class,
             'admin.only' => \App\Http\Middleware\AdminOnly::class,
             'password.confirm' => \App\Http\Middleware\RequirePasswordConfirmation::class,
+            'track.views' => \App\Http\Middleware\TrackPageViews::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

@@ -282,7 +282,7 @@
 
                                     {{-- Post Info --}}
                                     <div class="flex-1 min-w-0">
-                                        <a href="{{ route('posts.show', $post) }}" class="text-zinc-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 font-semibold line-clamp-1 transition-colors">
+                                        <a href="{{ route('posts.show', $post->slug) }}" class="text-zinc-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 font-semibold line-clamp-1 transition-colors">
                                             {{ $post->title }}
                                         </a>
                                         <div class="flex items-center gap-3 mt-1 text-xs text-zinc-500 dark:text-zinc-400">

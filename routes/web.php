@@ -21,10 +21,13 @@ Route::get('/', function () {
     return view('home');
 })->name('home');
 
-// Public posts route (no auth)
-Route::get('/posts', [PublicPostController::class, 'index'])->name('public.posts.index');
-Route::get('/posts/{id}', [PublicPostController::class, 'show'])->name('public.posts.show');
-
+// Public post routes with tracking
+Route::middleware(['track.views'])->group(function () {
+    Route::get('/posts', [PublicPostController::class, 'index'])
+        ->name('public.posts.index');
+    Route::get('/posts/{post:slug}', [PublicPostController::class, 'show']) // Changed
+        ->name('public.posts.show');
+});
 // About and Contact pages (Livewire)
 Route::get('/about', function () {
     return view('about');

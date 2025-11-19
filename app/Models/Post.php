@@ -16,6 +16,7 @@ class Post extends Model
 
     protected $fillable = [
         'title',
+        'slug',
         'content',
         'user_id',
         'category_id',
@@ -145,13 +146,35 @@ class Post extends Model
 
     protected static function booted()
     {
-        static::updated(function ($post) {
+        static::creating(function ($post) {
+            if (empty($post->slug)) {
+                $post->slug = Str::slug($post->title);
+                
+                // Ensure uniqueness
+                $count = 1;
+                while (Post::where('slug', $post->slug)->exists()) {
+                    $post->slug = Str::slug($post->title) . '-' . $count;
+                    $count++;
+                }
+            }
+        });
 
+        static::updating(function ($post) {
+            // Only update slug if title changed and slug is empty
+            if ($post->isDirty('title') && empty($post->slug)) {
+                $post->slug = Str::slug($post->title);
+                
+                $count = 1;
+                while (Post::where('slug', $post->slug)->where('id', '!=', $post->id)->exists()) {
+                    $post->slug = Str::slug($post->title) . '-' . $count;
+                    $count++;
+                }
+            }
+            
             $post->clearReactionCache();
         });
 
         static::deleted(function ($post) {
-
             $post->clearReactionCache();
         });
     }
@@ -200,6 +223,12 @@ class Post extends Model
     public function getCommentsCountAttribute()
     {
         return $this->comments()->approved()->count();
+    }
+
+    // Add route model binding by slug
+    public function getRouteKeyName()
+    {
+        return 'slug';
     }
 
 }

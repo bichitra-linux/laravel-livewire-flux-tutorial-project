@@ -20,33 +20,33 @@ class PostController extends Controller
      */
     public function index(Request $request)
     {
-    $query = Post::with('user', 'category', 'tags')->latestPosts();
+        $query = Post::with('user', 'category', 'tags')->latestPosts();
 
-    $selectedCategory = null;
-    if ($request->filled('category')) {
-        // Separate queries based on whether value is numeric
-        if (is_numeric($request->category)) {
-            // If numeric, it could be either id or slug like "123"
-            $selectedCategory = Category::where('id', $request->category)->first();
-            
-            // If not found by id, try slug
-            if (!$selectedCategory) {
+        $selectedCategory = null;
+        if ($request->filled('category')) {
+            // Separate queries based on whether value is numeric
+            if (is_numeric($request->category)) {
+                // If numeric, it could be either id or slug like "123"
+                $selectedCategory = Category::where('id', $request->category)->first();
+
+                // If not found by id, try slug
+                if (!$selectedCategory) {
+                    $selectedCategory = Category::where('slug', $request->category)->first();
+                }
+            } else {
+                // If string, only search by slug
                 $selectedCategory = Category::where('slug', $request->category)->first();
             }
-        } else {
-            // If string, only search by slug
-            $selectedCategory = Category::where('slug', $request->category)->first();
+
+            if ($selectedCategory) {
+                $query->where('category_id', $selectedCategory->id);
+            }
         }
 
-        if ($selectedCategory) {
-            $query->where('category_id', $selectedCategory->id);
-        }
+        $posts = $query->paginate(10);
+
+        return view('posts.index', compact('posts', 'selectedCategory'));
     }
-    
-    $posts = $query->paginate(10);
-    
-    return view('posts.index', compact('posts', 'selectedCategory'));
-}
 
     /**
      * Show the form for creating a new resource.
@@ -62,73 +62,45 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([  // Fixed: Use instance method
+        $validated = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
-            'category_id' => 'nullable|exists:categories,id',
+            'image' => [
+                'nullable',
+                'image',
+                'mimes:jpeg,png,jpg,webp',
+                'max:5120', // 5MB
+                'dimensions:min_width=100,min_height=100,max_width=4000,max_height=4000'
+            ],
+            'category_id' => 'required|exists:categories,id',
+            'tags' => 'nullable|array',
+            'tags.*' => 'exists:tags,id',
             'status' => 'required|in:draft,published,archived',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'tags' => 'nullable|string',
         ]);
 
         // Handle image upload with resize (v3 syntax)
         $imagePath = null;
         if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $filename = time() . '_' . Str::slug(pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $image->getClientOriginalExtension();
+            $file = $request->file('image');
 
-            // Create ImageManager with GD driver
-            $manager = new Image(new Driver());
+            // Secure filename generation
+            $filename = Str::random(40) . '.' . $file->getClientOriginalExtension();
 
-            // Read and resize image
-            $img = $manager->read($image->getRealPath());
-            $img->cover(1920, 1080); // Resize to 1920x1080 (cover = fit + crop)
+            // Use Laravel Storage (more secure)
+            $path = $file->storeAs('posts', $filename, 'public');
 
-            // Ensure directory exists
-            $directory = storage_path('app/public/posts');
-            if (!file_exists($directory)) {
-                mkdir($directory, 0755, true);
-            }
-
-            // Save to storage
-            $img->save($directory . '/' . $filename, quality: 85);
-            $imagePath = 'posts/' . $filename;
+            $validated['image'] = 'posts/' . $filename;
         }
 
-        $post = Auth::user()->posts()->create([
-            'title' => $validated['title'],
-            'content' => $validated['content'],
-            'category_id' => $validated['category_id'],
-            'status' => $validated['status'] ? PostStatus::from($validated['status']) : PostStatus::Draft,
-            'image' => $imagePath,
-        ]);
+        $post = Auth::user()->posts()->create($validated);
 
         // Handle tags
-        if ($request->filled('tags')) {
-            $tagNames = array_map('trim', explode(',', $request->tags));
-            $tagIds = [];
-
-            foreach ($tagNames as $tagName) {
-            if (!empty($tagName)) {
-                $slug = Str::slug($tagName);
-                $tag = Tag::firstOrCreate(
-                    ['slug' => $slug],  // Use slug as unique key
-                    ['name' => $tagName]
-                );
-                $tagIds[] = $tag->id;
-            }
+        if (isset($validated['tags'])) {
+            $post->tags()->attach($validated['tags']);
         }
 
-            $post->tags()->sync($tagIds);
-        }
-
-        session()->flash('toast', [
-            'variant' => 'success',
-            'heading' => 'Post created successfully',
-            'text' => 'Your post "' . $post->title . '" has been created',
-        ]);
-
-        return redirect()->route('posts.index')->with('success', 'Post created successfully.');
+        return redirect()->route('posts.index')
+            ->with('success', 'Post created successfully!');
     }
 
     /**
@@ -171,92 +143,45 @@ class PostController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        $post = Auth::user()->posts()->findOrFail($id);
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
-            'category_id' => 'nullable|exists:categories,id',
+            'image' => [
+                'nullable',
+                'image',
+                'mimes:jpeg,png,jpg,webp',
+                'max:5120',
+                'dimensions:min_width=100,min_height=100,max_width=4000,max_height=4000'
+            ],
+            'category_id' => 'required|exists:categories,id',
+            'tags' => 'nullable|array',
+            'tags.*' => 'exists:tags,id',
             'status' => 'required|in:draft,published,archived',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'tags' => 'nullable|string',
-            'remove_image' => 'nullable|boolean',
-
         ]);
-        $post = Auth::user()->posts()->findOrFail($id);
 
         // Handle image upload
-        $imagePath = $post->image;
-
-        // Remove image if checkbox is checked
-        if ($request->has('remove_image') && $request->remove_image == '1') {
-            if ($post->image && Storage::disk('public')->exists($post->image)) {
-                Storage::disk('public')->delete($post->image);
-            }
-            $imagePath = null;
-        }
-
-        // Upload new image with resize (v3 syntax)
         if ($request->hasFile('image')) {
-            // Delete old image if exists
-            if ($post->image && Storage::disk('public')->exists($post->image)) {
-                Storage::disk('public')->delete($post->image);
-            }
-
-            $image = $request->file('image');
-            $filename = time() . '_' . Str::slug(pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $image->getClientOriginalExtension();
-
-            // Create ImageManager with GD driver
-            $manager = new Image(new Driver());
-
-            // Read and resize image
-            $img = $manager->read($image->getRealPath());
-            $img->cover(1920, 1080); // Resize to 1920x1080
-
-            // Ensure directory exists
-            $directory = storage_path('app/public/posts');
-            if (!file_exists($directory)) {
-                mkdir($directory, 0755, true);
-            }
-
-            // Save to storage
-            $img->save($directory . '/' . $filename, quality: 85);
-            $imagePath = 'posts/' . $filename;
+        // Delete old image if exists
+        if ($post->image && \Storage::disk('public')->exists($post->image)) {
+            \Storage::disk('public')->delete($post->image);
         }
 
-        $post->update([
-            'title' => $validated['title'],
-            'content' => $validated['content'],
-            'category_id' => $validated['category_id'],
-            'status' => $validated['status'] ? PostStatus::from($validated['status']) : $post->status,
-            'image' => $imagePath,
-        ]);
+        $file = $request->file('image');
+        $filename = Str::random(40) . '.' . $file->getClientOriginalExtension();
+        $path = $file->storeAs('posts', $filename, 'public');
+        $validated['image'] = 'posts/' . $filename;
+    }
 
-        // Handle tags
-        if ($request->filled('tags')) {
-            $tagNames = array_map('trim', explode(',', $request->tags));
-            $tagIds = [];
+    $post->update($validated);
 
-            foreach ($tagNames as $tagName) {
-                if (!empty($tagName)) {
-                    $tag = Tag::firstOrCreate(
-                        ['name' => $tagName],
-                        ['slug' => Str::slug($tagName)]
-                    );
-                    $tagIds[] = $tag->id;
-                }
-            }
+    if (isset($validated['tags'])) {
+        $post->tags()->sync($validated['tags']);
+    }
 
-            $post->tags()->sync($tagIds);
-        } else {
-            $post->tags()->detach();
-        }
-
-        session()->flash('toast', [
-            'variant' => 'success',
-            'heading' => 'Post updated successfully',
-            'text' => 'Your post has been updated',
-        ]);
-
-        return redirect()->route('posts.index')->with('success', 'Post updated successfully.');
+    return redirect()->route('posts.index')
+        ->with('success', 'Post updated successfully!');
     }
 
     /**

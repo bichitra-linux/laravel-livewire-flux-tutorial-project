@@ -435,7 +435,7 @@
                                                 {{-- Comment Content --}}
                                                 <div class="prose prose-sm dark:prose-invert max-w-none mb-3">
                                                     <p class="text-gray-700 dark:text-gray-300 leading-relaxed">
-                                                        {{ preg_replace('/^\s+|\s+$/u', '', $comment->content) }}
+                                                        {{ $comment->safe_content }}
                                                     </p>
                                                 </div>
 

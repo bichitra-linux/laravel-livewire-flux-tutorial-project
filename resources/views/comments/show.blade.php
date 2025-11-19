@@ -78,7 +78,7 @@
 
                         <div class="prose dark:prose-invert max-w-none">
                             <p class="text-gray-900 dark:text-white text-lg leading-relaxed">
-                                {{ $comment->content }}
+                                {!! $comment->safe_content !!}
                             </p>
                         </div>
 
@@ -177,7 +177,7 @@
                                                     </span>
                                                 @endif
                                             </div>
-                                            <p class="text-gray-700 dark:text-gray-300">{{ $reply->content }}</p>
+                                            <p class="text-gray-700 dark:text-gray-300">{!! $reply->safe_content !!}</p>
                                             
                                             <div class="flex gap-2 mt-3">
                                                 @if(!$reply->is_approved)

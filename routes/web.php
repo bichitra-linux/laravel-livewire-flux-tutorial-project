@@ -14,6 +14,7 @@ use App\Http\Controllers\PublicPostController;
 use App\Http\Controllers\ReactionController;
 use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\AnalyticsController;
 use App\Http\Controllers\CommentController;
 
 Route::get('/', function () {
@@ -71,6 +72,9 @@ Route::middleware(['auth', 'verified', 'admin.only'])->prefix('admin')->group(fu
     // Users Management 
     Route::resource('users', UserController::class)->only(['index', 'show', 'destroy']);
 
+    // Analytics Management
+    Route::get('/analytics', [AnalyticsController::class, 'index'])->name('analytics.index');
+
 
 
     // Notifications Management
@@ -79,6 +83,8 @@ Route::middleware(['auth', 'verified', 'admin.only'])->prefix('admin')->group(fu
     Route::post('/notifications/clear-read', [NotificationController::class, 'clearRead'])->name('notifications.clearRead');
     Route::patch('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
     Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
+
+
 
     // ✅ Admin Settings (unique names)
 
@@ -95,6 +101,8 @@ Route::middleware(['auth', 'verified', 'admin.only'])->prefix('admin')->group(fu
         $request->session()->put('auth.password_confirmed_at', time());
         return redirect()->intended();
     })->name('admin.password.confirm.store');
+
+    
 
     Route::redirect('settings', 'settings/profile');
     Volt::route('settings/profile', 'settings.profile')->name('admin.profile.edit');

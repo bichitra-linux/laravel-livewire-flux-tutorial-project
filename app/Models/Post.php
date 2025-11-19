@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Auth;
 class Post extends Model
 {
     use HasFactory;
-    
+
     protected $fillable = [
         'title',
         'content',
@@ -49,15 +49,18 @@ class Post extends Model
     // UPDATED: Better caching
     public function getReactionCountsAttribute()
     {
-       return Cache::remember("post.{$this->id}.reaction_counts", now()->addMinutes(5), function () {
-        if ($this->relationLoaded('reactions')){
-            return $this->reactions->groupBy('type')->map->count();
-        }
-        
-        return $this->reactions()->selectRaw('type, COUNT(*) as count')
-           ->groupBy('type')
-           ->pluck('count', 'type');
-       });
+        return Cache::remember("post.{$this->id}.reaction_counts", now()->addMinutes(5), function () {
+            if ($this->relationLoaded('reactions')) {
+                return $this->reactions->groupBy('type')->map->count();
+            }
+
+            // Use query builder properly (no raw SQL with user input)
+            return $this->reactions()
+                ->select('type')
+                ->selectRaw('COUNT(*) as count')
+                ->groupBy('type')
+                ->pluck('count', 'type');
+        });
     }
 
     // UPDATED: Better performance
@@ -66,7 +69,7 @@ class Post extends Model
         return Cache::remember(
             "post.{$this->id}.total_reactions",
             now()->addMinutes(5),
-            function() {
+            function () {
                 if ($this->relationLoaded('reactions')) {
                     return $this->reactions->count();
                 }
@@ -79,12 +82,12 @@ class Post extends Model
     public function userReaction($userId = null)
     {
         $userId = $userId ?? Auth::id();
-        
+
         // If reactions are loaded, find in collection
         if ($this->relationLoaded('reactions')) {
             return $this->reactions->firstWhere('user_id', $userId);
         }
-        
+
         return $this->reactions()->where('user_id', $userId)->first();
     }
 
@@ -140,8 +143,9 @@ class Post extends Model
         ];
     }
 
-    protected static function booted(){
-        static::updated(function ($post){
+    protected static function booted()
+    {
+        static::updated(function ($post) {
 
             $post->clearReactionCache();
         });
@@ -153,40 +157,48 @@ class Post extends Model
     }
 
 
-    public function clearReactionCache(){
+    public function clearReactionCache()
+    {
         Cache::forget("post.{$this->id}.reaction_counts");
         Cache::forget("post.{$this->id}.total_reactions");
     }
 
-    public function getMostPopularReactionAttribute(): ?string{
-
-        $mostPopular = $this->reactions()->selectRaw('type, COUNT(*) as count')
+    public function getMostPopularReactionAttribute(): ?string
+    {
+        $mostPopular = $this->reactions()
+            ->select('type')
+            ->selectRaw('COUNT(*) as count')
             ->groupBy('type')
             ->orderByDesc('count')
             ->first();
 
-        return $mostPopular ? $mostPopular->type->value : null;
+        return $mostPopular?->type?->value;
     }
 
 
-    public function getReactionPercentageAttribute(): array{
+    public function getReactionPercentageAttribute(): array
+    {
         $total = $this->total_reactions;
 
-        if($total === 0) return [];
+        if ($total === 0)
+            return [];
 
         return $this->reaction_counts->map(fn($count) => round(($count / $total) * 100, 2))->toArray();
     }
 
 
-    public function comments(){
+    public function comments()
+    {
         return $this->hasMany(Comment::class);
     }
 
-    public function approvedComments(){
+    public function approvedComments()
+    {
         return $this->hasMany(Comment::class)->approved();
     }
 
-    public function getCommentsCountAttribute(){
+    public function getCommentsCountAttribute()
+    {
         return $this->comments()->approved()->count();
     }
 

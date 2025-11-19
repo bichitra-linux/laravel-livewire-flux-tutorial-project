@@ -24,6 +24,7 @@ class TagSeeder extends Seeder
             'Report',
             'Update',
             
+            
             // Topics
             'Technology',
             'Innovation',
@@ -39,6 +40,38 @@ class TagSeeder extends Seeder
             'Education',
             'Entertainment',
             'Sports',
+            'Culture',
+            'Science',
+            'Travel',
+            'Lifestyle',
+            'Business',
+            'Finance',
+            'Markets',
+            'Real Estate',
+            'Retail',
+            'E-commerce',
+            'Politics',
+            'World News',
+            'Local News',
+            'Human Rights',
+            'Social Justice',
+            'Arts',
+            'Music',
+            'Film',
+            'Television',
+            'Books',
+            'Food & Drink',
+            'Fashion',
+            'Automotive',
+            'Gaming',
+            'Space Exploration',
+            'Health & Wellness',
+            'Mental Health',
+            'Fitness',
+            'Nutrition',
+            'Parenting',
+            'Relationships',
+            'Travel & Leisure',
             
             // Content Features
             'Trending',
@@ -47,6 +80,11 @@ class TagSeeder extends Seeder
             'Quick Take',
             'Video',
             'Podcast',
+            'Infographic',
+            'Photo Gallery',
+            'Live Coverage',
+            'Breaking',
+
             
             // Regions
             'US News',

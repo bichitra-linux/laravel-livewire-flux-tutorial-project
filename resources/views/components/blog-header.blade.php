@@ -59,7 +59,7 @@
                         <button id="theme-toggle" 
                                 type="button" 
                                 aria-label="Toggle Theme"
-                                class="p-1.5 rounded-lg hover:bg-gray-400 dark:hover:bg-gray-800 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1">
+                                class="p-1.5 rounded-lg hover:bg-gray-400 dark:hover:bg-gray-800 transition-colors duration-200 focus:outline-none">
                             <svg id="theme-toggle-light-icon" 
                                  class="w-4 h-4 hidden text-yellow-500" 
                                  fill="currentColor" 
@@ -685,6 +685,13 @@
                     closeIcon?.classList.toggle('hidden');
                 });
             }
+
+            document.querySelectorAll('#mobile-menu a').forEach(link => {
+    link.addEventListener('click', () => {
+        const menu = document.getElementById('mobile-menu');
+        menu?.classList.add('hidden');
+    });
+});
         }
 
         // Initialize on load

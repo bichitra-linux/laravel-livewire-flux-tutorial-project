@@ -45,11 +45,11 @@ class Home extends Component
     {
         // Get Featured Posts (posts with "Featured" tag)
         $featuredTag = Tag::where('slug', 'featured')->first();
-        
+
         $featuredPosts = collect();
         if ($featuredTag) {
             $featuredPosts = Post::with('user', 'category', 'tags')
-                ->whereHas('tags', function($query) use ($featuredTag) {
+                ->whereHas('tags', function ($query) use ($featuredTag) {
                     $query->where('tags.id', $featuredTag->id);
                 })
                 ->where('status', PostStatus::Published)
@@ -62,30 +62,30 @@ class Home extends Component
         $query = Post::with('user', 'category', 'tags')
             ->latestPosts()
             ->where('status', PostStatus::Published);
-        
+
         // Exclude featured posts from regular listing
         if ($featuredPosts->isNotEmpty()) {
             $query->whereNotIn('id', $featuredPosts->pluck('id'));
         }
-            
-        if ($this->search){
-            $query->where(function($q) {
+
+        if ($this->search) {
+            $query->where(function ($q) {
                 $q->where('title', 'like', "%{$this->search}%")
-                  ->orWhere('content', 'like', "%{$this->search}%");
+                    ->orWhere('content', 'like', "%{$this->search}%");
             });
         }
 
         if ($this->category) {
-            $query->where(function($q) {
+            $query->where(function ($q) {
                 // If numeric, check both id and slug
                 if (is_numeric($this->category)) {
-                    $q->whereHas('category', function($subQuery) {
+                    $q->whereHas('category', function ($subQuery) {
                         $subQuery->where('id', $this->category)
-                                 ->orWhere('slug', $this->category);
+                            ->orWhere('slug', $this->category);
                     });
                 } else {
                     // If string, only check slug
-                    $q->whereHas('category', function($subQuery) {
+                    $q->whereHas('category', function ($subQuery) {
                         $subQuery->where('slug', $this->category);
                     });
                 }
@@ -93,20 +93,24 @@ class Home extends Component
         }
 
         // Get limited posts for homepage
-        $posts = $query->take($this->limit)->get();
-        
+        $posts = $query
+            ->with(['reactions' => fn($q) => $q->select('id', 'post_id', 'user_id', 'type')])
+            ->withCount('reactions')
+            ->take($this->limit)
+            ->get();
+
         // Check if there are more posts
         $totalPosts = Post::where('status', PostStatus::Published)->count();
         $hasMore = $totalPosts > ($this->limit + $featuredPosts->count());
-        
+
         $categories = Category::orderBy('name')->get();
-        
+
         // Load popular tags with post count
         $popularTags = Tag::withCount('posts')
             ->orderBy('posts_count', 'desc')
             ->take(8)
             ->get();
-            
+
         return view('livewire.home', compact('posts', 'featuredPosts', 'categories', 'popularTags', 'hasMore', 'totalPosts'));
     }
 }

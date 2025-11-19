@@ -36,38 +36,55 @@ class CommentSection extends Component
         $this->lastUpdated = now()->timestamp;
     }
 
-    public function toggleSection(){
+    public function toggleSection()
+    {
         $this->isExpanded = !$this->isExpanded;
 
-        if ($this->isExpanded){
+        if ($this->isExpanded) {
             $this->dispatch('section-expanded');
         }
     }
 
-    public function collapseAllThreads(){
+    public function collapseAllThreads()
+    {
         $this->allThreadsExpanded = false;
         $this->dispatch('threads-collapsed');
     }
 
-    public function expandAllThreads(){
+    public function expandAllThreads()
+    {
         $this->allThreadsExpanded = true;
         $this->dispatch('threads-expanded');
     }
 
     public function postComment()
     {
-        // Rate limiting
-        $key = 'comment:' . Auth::id();
 
-        if (RateLimiter::tooManyAttempts($key, 5)) {
+        // Check reply depth
+        if ($this->parentId) {
+            $depth = 0;
+            $parent = Comment::find($this->parentId);
+            while ($parent && $parent->parent_id) {
+                $depth++;
+                if ($depth >= 3) {
+                    $this->addError('content', 'Maximum reply depth reached');
+                    return;
+                }
+                $parent = $parent->parent;
+            }
+        }
+        // Rate limiting
+        $key = 'comment:' . Auth::id() . ':' . request()->ip();
+
+        if (RateLimiter::tooManyAttempts($key, 3)) {
             $seconds = RateLimiter::availableIn($key);
-            $this->addError('content', "Too many comments. Please try again in {$seconds} seconds.");
+            $this->addError('content', "Too many comments. Please wait {$seconds} seconds.");
             return;
         }
 
         $this->validate();
 
-        RateLimiter::hit($key, 60);
+        RateLimiter::hit($key, 120); // 3 attempts per 2 minutes
 
         // Validate parent comment if replying
         if ($this->parentId) {
@@ -194,7 +211,11 @@ class CommentSection extends Component
         $query = $this->post->comments()
             ->approved()
             ->parentOnly()
-            ->with(['user', 'replies.user']);
+            ->with([
+                'user:id,name,email',
+                'replies' => fn($q) => $q->approved()->with('user:id,name,email')
+            ])
+            ->withCount('replies');
 
 
         switch ($this->sortBy) {
@@ -217,7 +238,7 @@ class CommentSection extends Component
             return $comment->replies->count();
         });
 
-        if(session()->has('message') || session()->has('error')){
+        if (session()->has('message') || session()->has('error')) {
             $this->isExpanded = true;
         }
 

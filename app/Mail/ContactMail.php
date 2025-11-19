@@ -27,12 +27,15 @@ class ContactMail extends Mailable
      */
     public function envelope(): Envelope
     {
+        // Sanitize inputs
+        $email = filter_var($this->data['email'], FILTER_SANITIZE_EMAIL);
+        $name = htmlspecialchars($this->data['name'], ENT_QUOTES, 'UTF-8');
+        $subject = htmlspecialchars($this->data['subject'], ENT_QUOTES, 'UTF-8');
+
         return new Envelope(
-            from: new Address($this->data['email'], $this->data['name']),
-            subject: 'New Contact Message: ' . $this->data['subject'],
-            replyTo: [
-                new Address($this->data['email'], $this->data['name']),
-            ],
+            from: new Address(config('mail.from.address'), config('mail.from.name')),
+            subject: 'Contact Form: ' . $subject,
+            replyTo: [new Address($email, $name)],
 
         );
     }

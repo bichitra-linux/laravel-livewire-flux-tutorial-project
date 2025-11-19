@@ -58,7 +58,7 @@ class PostSeeder extends Seeder
         }
 
         $postCount = 0;
-        $totalPosts = 30; // Create 30 posts
+        $totalPosts = 50; // Create 50 posts
 
         // Progress bar
         $bar = $this->command->getOutput()->createProgressBar($totalPosts);
@@ -104,7 +104,7 @@ class PostSeeder extends Seeder
             ]);
 
             // Attach 2-5 random tags
-            $randomTags = $allTags->random(rand(2, 5));
+            $randomTags = $allTags->random(rand(5, 15));
             $post->tags()->attach($randomTags);
 
             $postCount++;

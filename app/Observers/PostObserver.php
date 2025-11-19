@@ -24,8 +24,11 @@ class PostObserver
 
     public function created(Post $post): void
     {
-        Log::info('Post created successfully: ' . $post->title . ' by ' . ($post->user->name ?? 'Unknown'));
-
+        Log::info('Post created', [
+            'post_id' => $post->id,
+            'user_id' => $post->user_id,
+            'status' => $post->status->value,
+        ]);
         // Notify the author
         if ($post->user) {
             $post->user->notify(new PostCreated($post));

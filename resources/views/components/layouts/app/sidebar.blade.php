@@ -18,6 +18,7 @@
                     <flux:navlist.item icon="newspaper" :href="route('newsletter.index')" :current="request()->routeIs('newsletter.index')" wire:navigate>{{ __('Newsletter') }}</flux:navlist.item>
                     <flux:navlist.item icon="users" :href="route('users.index')" :current="request()->routeIs('users.index')" wire:navigate>{{ __('Users') }}</flux:navlist.item>
                     <flux:navlist.item icon="chat-bubble-oval-left" :href="route('comments.index')" :current="request()->routeIs('comments.index')" wire:navigate>{{ __('Comments') }}</flux:navlist.item>
+                    <flux:navlist.item icon="chart-bar" :href="route('analytics.index')" :current="request()->routeIs('analytics.index')" wire:navigate>{{ __('Analytics') }}</flux:navlist.item>
                 </flux:navlist.group>
             </flux:navlist>
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Comment;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
 class CommentController extends Controller
@@ -10,6 +11,10 @@ class CommentController extends Controller
     //
     public function index(Request $request)
     {
+
+        if (!Auth::user()->hasAnyRole(['admin', 'editor'])) {
+            abort(403, 'You do not have permission to manage comments.');
+        }
 
         $stats = [
             'total' => Comment::count(),
@@ -66,24 +71,37 @@ class CommentController extends Controller
 
     public function show(Comment $comment)
     {
+
+        if (!Auth::user()->hasAnyRole(['admin', 'editor'])) {
+            abort(403, 'You do not have permission to view this comment.');
+        }
         $comment->load(['user', 'post', 'replies.user', 'parent']);
         return view('comments.show', compact('comment'));
     }
 
     public function approve(Comment $comment)
     {
+        if (!Auth::user()->hasAnyRole(['admin', 'editor'])) {
+            abort(403, 'You do not have permission to approve comments.');
+        }
         $comment->update(['is_approved' => true]);
         return back()->with('success', 'Comment approved successfully.');
     }
 
     public function reject(Comment $comment)
     {
+        if (!Auth::user()->hasAnyRole(['admin', 'editor'])) {
+            abort(403, 'You do not have permission to reject comments.');
+        }
         $comment->update(['is_approved' => false]);
         return back()->with('success', 'Comment marked as pending.');
     }
 
     public function destroy(Comment $comment)
     {
+        if (!Auth::user()->hasAnyRole(['admin', 'editor'])) {
+            abort(403, 'You do not have permission to delete comments.');
+        }
         // Delete all replies first
         $comment->replies()->delete();
         // Delete the comment
@@ -94,6 +112,9 @@ class CommentController extends Controller
 
     public function bulkApprove(Request $request)
     {
+        if (!Auth::user()->hasAnyRole(['admin', 'editor'])) {
+            abort(403, 'You do not have permission to approve comments.');
+        }
         $request->validate([
             'comment_ids' => 'required|array',
             'comment_ids.*' => 'exists:comments,id'
@@ -106,6 +127,9 @@ class CommentController extends Controller
 
     public function bulkDelete(Request $request)
     {
+        if (!Auth::user()->hasAnyRole(['admin', 'editor'])) {
+            abort(403, 'You do not have permission to delete comments.');
+        }
         $request->validate([
             'comment_ids' => 'required|array',
             'comment_ids.*' => 'exists:comments,id'

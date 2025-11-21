@@ -10,6 +10,7 @@ use App\Notifications\PostDeleted;
 use App\Notifications\PostPublished;
 use App\Models\NewsletterSubscriber;
 use Illuminate\Support\Facades\Log;
+use App\Services\CacheService;
 use Illuminate\Support\Facades\Notification;
 
 class PostObserver
@@ -38,6 +39,8 @@ class PostObserver
             Log::info('Post created with Published status, notifying subscribers...');
             $this->notifySubscribersAboutNewPost($post);
         }
+
+        CacheService::clearPostCache();
     }
 
     public function updating(Post $post): void
@@ -59,6 +62,8 @@ class PostObserver
             Log::info('Post status changed to Published, notifying subscribers...');
             $this->notifySubscribersAboutNewPost($post);
         }
+
+        CacheService::clearPostCache();
     }
 
     public function deleting(Post $post): void
@@ -74,6 +79,8 @@ class PostObserver
         if ($post->user) {
             $post->user->notify(new PostDeleted($post->title));
         }
+
+        CacheService::clearPostCache();
     }
 
     public function restored(Post $post): void

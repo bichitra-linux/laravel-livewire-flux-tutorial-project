@@ -6,10 +6,12 @@ use App\Models\Post;
 use App\Models\Tag;
 use App\Models\Category;
 use App\Enums\PostStatus;
+use App\Services\ImageOptimizationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use App\Services\CacheService;
 use Intervention\Image\ImageManager as Image;
 use Intervention\Image\Drivers\Gd\Driver;
 
@@ -60,7 +62,7 @@ class PostController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request, ImageOptimizationService $imageService)
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
@@ -81,15 +83,11 @@ class PostController extends Controller
         // Handle image upload with resize (v3 syntax)
         $imagePath = null;
         if ($request->hasFile('image')) {
-            $file = $request->file('image');
-
-            // Secure filename generation
-            $filename = Str::random(40) . '.' . $file->getClientOriginalExtension();
-
-            // Use Laravel Storage (more secure)
-            $path = $file->storeAs('posts', $filename, 'public');
-
-            $validated['image'] = 'posts/' . $filename;
+            $validated['image'] = $imageService->optimizeAndSave(
+                $request->file('image'),
+                'posts',
+                1200
+            );
         }
 
         $post = Auth::user()->posts()->create($validated);
@@ -119,11 +117,8 @@ class PostController extends Controller
             ->take(4)
             ->get();
 
-        // Popular posts (latest 5 published)
-        $popular = Post::where('status', PostStatus::Published)
-            ->latest()
-            ->take(5)
-            ->get();
+        // ✅ Use CacheService for popular posts
+        $popular = CacheService::getPopularPosts(5);
 
         return view('posts.show', compact('post', 'related', 'popular'));
     }
@@ -163,25 +158,25 @@ class PostController extends Controller
 
         // Handle image upload
         if ($request->hasFile('image')) {
-        // Delete old image if exists
-        if ($post->image && \Storage::disk('public')->exists($post->image)) {
-            \Storage::disk('public')->delete($post->image);
+            // Delete old image if exists
+            if ($post->image && \Storage::disk('public')->exists($post->image)) {
+                \Storage::disk('public')->delete($post->image);
+            }
+
+            $file = $request->file('image');
+            $filename = Str::random(40) . '.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('posts', $filename, 'public');
+            $validated['image'] = 'posts/' . $filename;
         }
 
-        $file = $request->file('image');
-        $filename = Str::random(40) . '.' . $file->getClientOriginalExtension();
-        $path = $file->storeAs('posts', $filename, 'public');
-        $validated['image'] = 'posts/' . $filename;
-    }
+        $post->update($validated);
 
-    $post->update($validated);
+        if (isset($validated['tags'])) {
+            $post->tags()->sync($validated['tags']);
+        }
 
-    if (isset($validated['tags'])) {
-        $post->tags()->sync($validated['tags']);
-    }
-
-    return redirect()->route('posts.index')
-        ->with('success', 'Post updated successfully!');
+        return redirect()->route('posts.index')
+            ->with('success', 'Post updated successfully!');
     }
 
     /**
@@ -197,6 +192,7 @@ class PostController extends Controller
         }
 
         $post->delete();
+        CacheService::clearPostCache();
 
         session()->flash('toast', [
             'variant' => 'success',

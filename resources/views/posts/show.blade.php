@@ -7,6 +7,45 @@
             ->take(5)
             ->get();
     @endphp
+
+    @php
+    $seoMeta = \App\Services\SeoService::getPostMeta($post);
+    $schema = \App\Services\SeoService::getPostSchema($post);
+@endphp
+
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
+    {{-- ✅ SEO Meta Tags --}}
+    <x-seo-meta
+        :title="$seoMeta['title']"
+        :description="$seoMeta['description']"
+        :keywords="$seoMeta['keywords']"
+        :image="$seoMeta['og_image']"
+        :url="$seoMeta['og_url']"
+        type="article"
+        :publishedTime="$seoMeta['article_published_time']"
+        :modifiedTime="$seoMeta['article_modified_time']"
+        :author="$seoMeta['article_author']"
+        :schema="$schema"
+        :canonical="$seoMeta['canonical']"
+    />
+
+    @include('partials.head')
+    @livewireStyles
+</head>
+<body>
+    <x-breadcrumbs :items="[
+    ['label' => 'Home', 'url' => route('home')],
+    ['label' => 'Blog', 'url' => route('public.posts.index')],
+    ['label' => $post->category?->name ?? 'Uncategorized', 'url' => route('public.posts.index', ['category' => $post->category?->slug])],
+    ['label' => $post->title, 'url' => '']
+]" />
+
     <div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-12">
         <div class="max-w-7xl mx-auto px-6">
             {{-- Hero Section --}}
@@ -314,3 +353,5 @@
     </div>
 </x-blog-header>
 <x-footer />
+</body>
+</html>

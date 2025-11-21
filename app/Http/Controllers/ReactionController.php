@@ -26,8 +26,9 @@ class ReactionController extends Controller
         $user = Auth::user();
         $type = $request->type;
 
-        // ✅ Rate limiting: 30 reactions per minute
-        $key = 'reaction:' . $user->id . ':' . $post->id;
+        // ✅ FIX: Use IP + User ID for rate limiting
+        $identifier = $user ? "user:{$user->id}" : "ip:{$request->ip()}";
+        $key = "reaction:{$identifier}";
         
         if (RateLimiter::tooManyAttempts($key, 30)) {
             $seconds = RateLimiter::availableIn($key);

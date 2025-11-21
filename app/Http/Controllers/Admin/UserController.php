@@ -16,6 +16,9 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
+        if (!Auth::user()->hasRole('admin')) {
+            abort(403, 'Only administrators can manage users.');
+        }
         $query = User::query()->with('roles');
 
         // Search filter
@@ -65,6 +68,9 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
+        if (!Auth::user()->hasRole('admin')) {
+            abort(403, 'Only administrators can view user details.');
+        }
         $user->load('roles', 'posts', 'reactions');
 
         return view('users.show', compact('user'));
@@ -75,6 +81,9 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
+        if (!Auth::user()->hasRole('admin')) {
+            abort(403, 'Only administrators can delete users.');
+        }
         // Prevent deleting self
         if ($user->id === Auth::id()) {
             return back()->with('error', 'You cannot delete your own account.');

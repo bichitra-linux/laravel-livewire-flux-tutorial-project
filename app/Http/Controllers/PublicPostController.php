@@ -70,7 +70,7 @@ class PublicPostController extends Controller
     {
         // Check if post is published
         if ($post->status !== PostStatus::Published) {
-            abort(404);
+            abort(404, 'This post is not available.');
         }
 
         // Load relationships

@@ -17,17 +17,22 @@ class AdminOnly
     {
         $user = $request->user();
 
-        // Check if user has admin/editor/writer role
+        // ✅ Check if user has admin/editor/writer role
         if ($user && $user->hasAnyRole(['admin', 'editor', 'writer'])) {
             return $next($request);
         }
 
-        // Redirect regular users to user settings
+        // ✅ Use abort(403) instead of redirect for authenticated users without permission
         if ($user && $user->hasRole('user')) {
-            return redirect()->route('user.profile.edit')->with('error', 'Access denied. You do not have admin privileges.');
+            abort(403, 'You do not have permission to access the admin area.');
         }
 
-        // If no valid role, redirect to home
-        return redirect()->route('home')->with('error', 'Access denied.');
+        // ✅ Redirect unauthenticated users to login
+        if (!$user) {
+            return redirect()->route('login')->with('error', 'Please login to continue.');
+        }
+
+        // ✅ Fallback: 403 for users without any role
+        abort(403, 'Access denied.');
     }
 }

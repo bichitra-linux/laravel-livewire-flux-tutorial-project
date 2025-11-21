@@ -2,28 +2,43 @@
 
 @php
     $user = auth()->user();
-    // ✅ Same logic as middleware
     $isAdmin = $user && $user->hasAnyRole(['admin', 'editor', 'writer']);
     $isRegularUser = $user && $user->hasRole('user') && !$user->hasAnyRole(['admin', 'editor', 'writer']);
 @endphp
 
-@if($isAdmin)
-    {{-- Admin/Editor/Writer: Show with sidebar --}}
-    <x-layouts.app.sidebar :title="$title">
-        <flux:main>
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    
+    <title>{{ $title ?? config('app.name') }}</title>
+    
+    {{-- ✅ ADD Google Analytics --}}
+    <x-google-analytics />
+    
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @livewireStyles
+</head>
+<body>
+    @if($isAdmin)
+        <x-layouts.app.sidebar :title="$title">
+            <flux:main>
+                {{ $slot }}
+            </flux:main>
+        </x-layouts.app.sidebar>
+    @elseif($isRegularUser)
+        <x-blog-header :title="$title">
             {{ $slot }}
-        </flux:main>
-    </x-layouts.app.sidebar>
-@elseif($isRegularUser)
-    {{-- Regular User: Show without sidebar (use blog header) --}}
-    <x-blog-header :title="$title">
-        {{ $slot }}
-    </x-blog-header>
-@else
-    {{-- Fallback for guests or users without roles --}}
-    <x-blog-header :title="$title">
-        {{ $slot }}
-
-        <x-footer />
-    </x-blog-header>
-@endif
+        </x-blog-header>
+    @else
+        <x-blog-header :title="$title">
+            {{ $slot }}
+            <x-footer />
+        </x-blog-header>
+    @endif
+    
+    @livewireScripts
+</body>
+</html>

@@ -7,6 +7,7 @@ use App\Models\NewsletterSubscriber;
 use App\Notifications\NewsletterWelcome;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 
 class NewsletterController extends Controller
 {
@@ -15,21 +16,22 @@ class NewsletterController extends Controller
     /**
      * Subscribe a user to the newsletter.
      */
-    public function subscribe(Request $request){
+    public function subscribe(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'email' => 'required|email|max:255',
             'name' => 'nullable|string|max:255',
         ]);
 
-        if ($validator->fails()){
+        if ($validator->fails()) {
             return back()->withErrors($validator)->withInput()->with('newsletter_error', 'Please enter a valid email address.');
         }
 
-        try{
+        try {
             $subscriber = NewsletterSubscriber::where('email', $request->email)->first();
 
-            if ($subscriber){
-                if ($subscriber->is_subscribed){
+            if ($subscriber) {
+                if ($subscriber->is_subscribed) {
                     return back()->with('newsletter_info', 'you are already subscribed to the newsletter.');
 
                 } else {
@@ -69,7 +71,7 @@ class NewsletterController extends Controller
             Log::info('Newsletter subscription: ' . $subscriber->email);
 
             return back()->with('newsletter_success', 'Thank you for subscribing to our newsletter!');
-        } catch (\Exception $e){
+        } catch (\Exception $e) {
 
             Log::error('Newsletter subscription error: ' . $e->getMessage());
             return back()->with('newsletter_error', 'An error occurred while processing your subscription. Please try again later.');
@@ -79,12 +81,13 @@ class NewsletterController extends Controller
     /**
      * Unsubscribe a user from the newsletter.
      */
-    public function unsubscribe($token){
+    public function unsubscribe($token)
+    {
         $subscriber = NewsletterSubscriber::where('token', $token)->firstOrFail();
 
         $subscriber->refresh();
 
-        if (!$subscriber->is_subscribed){
+        if (!$subscriber->is_subscribed) {
             return view('newsletter.already-unsubscribed', compact('subscriber'));
         }
 
@@ -97,14 +100,18 @@ class NewsletterController extends Controller
     /**
      * Admin: View all subscribers.
      */
-    public function index(){
+    public function index()
+    {
+        if (!Auth::user()->hasAnyRole(['admin', 'editor'])) {
+            abort(403, 'You do not have permission to manage newsletters.');
+        }
         $subscribers = NewsletterSubscriber::latest()->paginate(20);
         $stats = [
             'total' => NewsletterSubscriber::count(),
             'active' => NewsletterSubscriber::active()->count(),
             'unsubscribed' => NewsletterSubscriber::where('is_subscribed', false)->count(),
             'today' => NewsletterSubscriber::whereDate('created_at', today())->count(),
-            
+
         ];
 
         return view('newsletter.index', compact('subscribers', 'stats'));
@@ -114,12 +121,16 @@ class NewsletterController extends Controller
      * Admin: Export subscribers
      */
 
-    public function export(){
+    public function export()
+    {
+        if (!Auth::user()->hasAnyRole(['admin', 'editor'])) {
+            abort(403, 'You do not have permission to export newsletter data.');
+        }
         $subscribers = NewsletterSubscriber::active()->get([
-            'email', 
-            'name', 
-            'ip_address', 
-            'user_agent', 
+            'email',
+            'name',
+            'ip_address',
+            'user_agent',
             'subscribed_at'
         ]);
         $filename = 'newsletter-subscribers-' . now()->format('Y-m-d') . '.csv';
@@ -129,11 +140,11 @@ class NewsletterController extends Controller
             'Content-Disposition' => "attachment; filename=\"{$filename}\"",
         ];
 
-        $callback = function() use ($subscribers){
+        $callback = function () use ($subscribers) {
             $file = fopen('php://output', 'w');
             fputcsv($file, ['Email', 'Name', 'IP Address', 'User Agent', 'Subscribed At']);
 
-            foreach ($subscribers as $subscriber){
+            foreach ($subscribers as $subscriber) {
                 fputcsv($file, [
                     $subscriber->email,
                     $subscriber->name ?? 'N/A',

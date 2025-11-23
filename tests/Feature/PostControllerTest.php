@@ -2,12 +2,15 @@
 
 use App\Models\Post;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Spatie\Permission\Models\Role;
 
-uses(RefreshDatabase::class);
-
-it('allows authenticated user to create a post', function () {
+test('it allows authenticated user to create a post', function () {
     $user = User::factory()->create();
+    
+    // ✅ Assign Role
+    Role::firstOrCreate(['name' => 'user']);
+    $user->assignRole('user');
+    
     $this->actingAs($user);
 
     $response = $this->post(route('posts.store'), [
@@ -24,9 +27,15 @@ it('allows authenticated user to create a post', function () {
     ]);
 });
 
-it('shows posts for authenticated user', function () {
+test('it shows posts for authenticated user', function () {
     $user = User::factory()->create();
+    
+    // ✅ Assign Role
+    Role::firstOrCreate(['name' => 'user']);
+    $user->assignRole('user');
+    
     $post = Post::factory()->create(['user_id' => $user->id]);
+
     $this->actingAs($user);
 
     $response = $this->get(route('posts.index'));
@@ -35,7 +44,8 @@ it('shows posts for authenticated user', function () {
     $response->assertSee($post->title);
 });
 
-it('prevents unauthorized access', function () {
+test('it prevents unauthorized access', function () {
     $response = $this->get(route('posts.index'));
-    $response->assertRedirect(route('login'));
+
+    $response->assertRedirect('/login');
 });

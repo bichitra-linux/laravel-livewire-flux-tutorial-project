@@ -13,13 +13,13 @@ test('login screen can be rendered', function () {
 test('users can authenticate using the login screen', function () {
     $user = User::factory()->create();
     
-    // ✅ Assign Role to ensure correct redirect
+    // ✅ Assign Role
     Role::firstOrCreate(['name' => 'user']);
     $user->assignRole('user');
 
     $response = $this->post('/login', [
         'email' => $user->email,
-        'password' => 'password', // Factory default is usually 'password'
+        'password' => 'password', // Ensure factory uses 'password'
     ]);
 
     $this->assertAuthenticated();

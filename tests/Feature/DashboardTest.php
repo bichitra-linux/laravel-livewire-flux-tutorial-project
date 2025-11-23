@@ -4,7 +4,7 @@ use App\Models\User;
 use Spatie\Permission\Models\Role;
 
 test('guests are redirected to the login page', function () {
-    $response = $this->get('/dashboard');
+    $response = $this->get(route('dashboard')); // Use named route to be safe
 
     $response->assertRedirect('/login');
 });
@@ -12,7 +12,7 @@ test('guests are redirected to the login page', function () {
 test('authenticated users can visit the dashboard', function () {
     $user = User::factory()->create();
     
-    // Create and assign role
+    // ✅ Assign Role
     Role::firstOrCreate(['name' => 'user']);
     $user->assignRole('user');
 

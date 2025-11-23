@@ -24,5 +24,5 @@ test('email can be verified', function () {
     expect($user->fresh()->hasVerifiedEmail())->toBeTrue();
 
     // admin user should be allowed in admin dashboard
-    $response->assertRedirect(route('dashboard', absolute: false).'?verified=1');
+    $response->assertRedirect(route('home', absolute: false) . '?verified=1');
 });

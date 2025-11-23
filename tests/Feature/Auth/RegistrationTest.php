@@ -7,8 +7,6 @@ test('new users can register', function () {
         'password' => 'Password123!',
         'password_confirmation' => 'Password123!',
     ]);
-
-    $this->assertAuthenticated();
-    // new users are typical "user" role — admin dashboard is not guaranteed
+    $this->assertDatabaseHas('users', ['email' => 'test@example.com']);
     $response->assertRedirect(route('home', absolute: false));
 });

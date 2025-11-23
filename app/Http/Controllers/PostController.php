@@ -117,7 +117,7 @@ class PostController extends Controller
             ->take(4)
             ->get();
 
-        // ✅ Use CacheService for popular posts
+        // Use CacheService for popular posts
         $popular = CacheService::getPopularPosts(5);
 
         return view('posts.show', compact('post', 'related', 'popular'));

@@ -22,10 +22,10 @@
     <header
         class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50 backdrop-blur-xl shadow-sm">
         {{-- Top Bar --}}
-        <div
+        <div wire:navigate.stop
             class="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200/50 dark:border-gray-800/50">
             <div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
-                <div class="grid grid-cols-3 items-center gap-2 h-14 sm:h-16">
+                <div class="grid grid-cols-3 items-center gap-2 h-12 sm:h-12">
                     {{-- Left: Date & Time - Compact on mobile --}}
                     <div class="flex items-center gap-2 justify-start">
                         <div class="flex flex-col sm:flex-row sm:items-center sm:gap-3">
@@ -39,7 +39,8 @@
                                 <time id="current-date"
                                     class="text-[10px] leading-tight sm:text-sm font-medium text-gray-700 dark:text-gray-300 transition-opacity duration-300"
                                     datetime="">
-                                    <span id="date-display">Loading...</span>
+                                    {{-- Empty, will be filled by script below --}}
+                                    <span id="date-display"></span>
                                 </time>
                             </div>
 
@@ -55,7 +56,7 @@
                                 <time id="current-time"
                                     class="text-[10px] leading-tight sm:text-sm font-medium text-gray-700 dark:text-gray-300 tabular-nums"
                                     datetime="">
-                                    --:--
+                                    {{-- Empty, will be filled by script below --}}
                                 </time>
                             </div>
                         </div>
@@ -65,9 +66,9 @@
                     <div id="weather-widget" class="flex items-center justify-center">
                         {{-- Loading State --}}
                         <div id="weather-loading" class="flex items-center gap-1.5">
-                            <div class="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gray-100 dark:bg-gray-800 animate-pulse">
+                            <div class="w-4 h-4 sm:w-6 sm:h-6 rounded-full bg-gray-100 dark:bg-gray-800 animate-pulse">
                             </div>
-                            <div class="w-10 h-3 sm:w-16 sm:h-4 bg-gray-100 dark:bg-gray-800 rounded animate-pulse">
+                            <div class="w-8 h-2 sm:w-12 sm:h-4 bg-gray-100 dark:bg-gray-800 rounded animate-pulse">
                             </div>
                         </div>
 
@@ -482,7 +483,51 @@
 
     {{-- Scripts --}}
     <script>
-        // Namespace to prevent conflicts
+        // STEP 1: Inline script in <head> or right after time elements
+        // This sets initial time INSTANTLY before any framework loads
+        (function () {
+            'use strict';
+
+            function setInitialTime() {
+                const now = new Date();
+                const dateEl = document.getElementById('date-display');
+                const timeEl = document.getElementById('current-time');
+                const dateParent = document.getElementById('current-date');
+
+                if (dateEl) {
+                    const isMobile = window.innerWidth < 640;
+                    const dateText = isMobile
+                        ? now.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' })
+                        : now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+                    dateEl.textContent = dateText;
+                }
+
+                if (dateParent) {
+                    dateParent.setAttribute('datetime', now.toISOString().split('T')[0]);
+                }
+
+                if (timeEl) {
+                    const time = now.toLocaleTimeString('en-US', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: true
+                    });
+                    const isoTime = now.toTimeString().split(' ')[0];
+                    timeEl.setAttribute('datetime', isoTime);
+                    timeEl.textContent = time;
+                }
+            }
+
+            // Run immediately - even before DOM is fully parsed
+            setInitialTime();
+
+            // Run again when DOM is ready (in case elements weren't available yet)
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', setInitialTime);
+            }
+        })();
+
+        // STEP 2: Main module for continuous updates
         window.HeaderModule = (function () {
             'use strict';
 
@@ -494,11 +539,17 @@
 
             const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
 
-            let state = {
-                initialized: false,
-                dateTimeInterval: null,
-                weatherData: null
-            };
+            // Store state in window to persist across Livewire navigation
+            if (!window.HeaderModuleState) {
+                window.HeaderModuleState = {
+                    initialized: false,
+                    dateTimeInterval: null,
+                    weatherData: null,
+                    lastWeatherFetch: null
+                };
+            }
+
+            const state = window.HeaderModuleState;
 
             // ==================== THEME ====================
             function initTheme() {
@@ -518,11 +569,9 @@
                 if (!lightIcon || !darkIcon) return;
 
                 if (isDark) {
-                    // Dark mode active - show sun icon
                     darkIcon.style.transform = 'rotate(90deg) scale(0)';
                     lightIcon.style.transform = 'rotate(0deg) scale(1)';
                 } else {
-                    // Light mode active - show moon icon
                     lightIcon.style.transform = 'rotate(90deg) scale(0)';
                     darkIcon.style.transform = 'rotate(0deg) scale(1)';
                 }
@@ -546,18 +595,14 @@
                     const isoDate = now.toISOString().split('T')[0];
                     dateEl.setAttribute('datetime', isoDate);
 
-                    // Responsive date format
                     const isMobile = window.innerWidth < 640;
                     const dateText = isMobile
                         ? now.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' })
                         : now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
 
+                    // Only update if changed (prevents unnecessary reflows)
                     if (dateDisplay.textContent !== dateText) {
-                        dateDisplay.style.opacity = '0.5';
-                        setTimeout(() => {
-                            dateDisplay.textContent = dateText;
-                            dateDisplay.style.opacity = '1';
-                        }, 150);
+                        dateDisplay.textContent = dateText;
                     }
                 }
 
@@ -568,8 +613,12 @@
                         hour12: true
                     });
                     const isoTime = now.toTimeString().split(' ')[0];
-                    timeEl.setAttribute('datetime', isoTime);
-                    timeEl.textContent = time;
+
+                    // Only update if changed
+                    if (timeEl.textContent !== time) {
+                        timeEl.setAttribute('datetime', isoTime);
+                        timeEl.textContent = time;
+                    }
                 }
             }
 
@@ -593,15 +642,22 @@
                 return false;
             }
 
-            async function fetchWeather() {
+            async function fetchWeather(force = false) {
+                // Prevent redundant fetches within 1 minute
+                if (!force && state.lastWeatherFetch && (Date.now() - state.lastWeatherFetch < 60000)) {
+                    if (state.weatherData) {
+                        displayWeather(state.weatherData);
+                    }
+                    return;
+                }
+
                 if (!navigator.geolocation) {
                     showWeatherError();
                     return;
                 }
 
                 // Try to load from cache first
-                if (loadCachedWeather()) {
-                    // Still fetch in background for freshness
+                if (!force && loadCachedWeather()) {
                     fetchWeatherInBackground();
                     return;
                 }
@@ -610,15 +666,19 @@
                     const position = await new Promise((resolve, reject) => {
                         navigator.geolocation.getCurrentPosition(resolve, reject, {
                             timeout: 8000,
-                            maximumAge: 5 * 60 * 1000, // 5 minutes
+                            maximumAge: 5 * 60 * 1000,
                             enableHighAccuracy: false
                         });
                     });
 
                     await fetchWeatherData(position.coords);
+                    state.lastWeatherFetch = Date.now();
                 } catch (err) {
                     console.warn('Weather fetch failed:', err);
-                    showWeatherError();
+                    // Don't show error if we have cached data
+                    if (!state.weatherData) {
+                        showWeatherError();
+                    }
                 }
             }
 
@@ -632,8 +692,8 @@
                         });
                     });
                     await fetchWeatherData(position.coords, true);
+                    state.lastWeatherFetch = Date.now();
                 } catch (err) {
-                    // Silently fail for background updates
                     console.debug('Background weather update failed');
                 }
             }
@@ -660,7 +720,6 @@
                     description: weatherInfo.description
                 };
 
-                // Cache the data
                 try {
                     localStorage.setItem(CACHE_KEYS.WEATHER, JSON.stringify(state.weatherData));
                     localStorage.setItem(CACHE_KEYS.WEATHER_TIME, Date.now().toString());
@@ -672,7 +731,6 @@
             }
 
             function getWeatherInfo(code) {
-                // WMO Weather interpretation codes
                 const weatherMap = {
                     0: { icon: '☀️', description: 'Clear sky' },
                     1: { icon: '🌤️', description: 'Mainly clear' },
@@ -720,14 +778,16 @@
                 if (temp) temp.textContent = `${data.temp}°C`;
                 if (desc) desc.textContent = data.description;
 
-                if (smooth && !content.classList.contains('hidden')) {
+                // Always show content, never show loading on navigation
+                loading?.classList.add('hidden');
+                content.classList.remove('hidden');
+                content.classList.add('flex');
+
+                if (smooth) {
                     content.style.opacity = '0.5';
                     setTimeout(() => { content.style.opacity = '1'; }, 200);
                 } else {
-                    loading?.classList.add('hidden');
-                    content.classList.remove('hidden');
-                    content.classList.add('flex');
-                    setTimeout(() => { content.style.opacity = '1'; }, 50);
+                    content.style.opacity = '1';
                 }
             }
 
@@ -748,14 +808,16 @@
                 const weatherBtn = document.getElementById('weather-content');
 
                 if (themeBtn) {
-                    themeBtn.replaceWith(themeBtn.cloneNode(true));
-                    document.getElementById('theme-toggle')?.addEventListener('click', toggleTheme);
+                    const newThemeBtn = themeBtn.cloneNode(true);
+                    themeBtn.replaceWith(newThemeBtn);
+                    newThemeBtn.addEventListener('click', toggleTheme);
                 }
 
                 if (weatherBtn) {
-                    weatherBtn.replaceWith(weatherBtn.cloneNode(true));
-                    document.getElementById('weather-content')?.addEventListener('click', () => {
-                        fetchWeather();
+                    const newWeatherBtn = weatherBtn.cloneNode(true);
+                    weatherBtn.replaceWith(newWeatherBtn);
+                    newWeatherBtn.addEventListener('click', () => {
+                        fetchWeather(true);
                     });
                 }
             }
@@ -765,24 +827,37 @@
                 initTheme();
 
                 if (!state.initialized) {
-                    updateDateTime();
+                    console.debug('First initialization');
+
+                    // Clear any existing interval
+                    if (state.dateTimeInterval) {
+                        clearInterval(state.dateTimeInterval);
+                    }
+
+                    // Start interval for continuous updates
                     state.dateTimeInterval = setInterval(updateDateTime, 1000);
+
+                    // Fetch weather
                     fetchWeather();
+
                     state.initialized = true;
                 } else {
-                    updateDateTime();
+                    console.debug('Already initialized - UI only');
+
+                    //  ensure display is correct (no flicker)
                     if (state.weatherData) {
                         displayWeather(state.weatherData);
                     }
                 }
 
+                // Always reattach event listeners
                 attachEventListeners();
             }
 
             // ==================== PUBLIC API ====================
             return {
                 init: initialize,
-                refresh: fetchWeather
+                refresh: () => fetchWeather(true)
             };
         })();
 
@@ -794,7 +869,9 @@
         }
 
         // Handle Livewire navigation
-        document.addEventListener('livewire:navigated', () => window.HeaderModule.init());
+        document.addEventListener('livewire:navigated', () => {
+            window.HeaderModule.init();
+        });
     </script>
 
     @livewireScripts

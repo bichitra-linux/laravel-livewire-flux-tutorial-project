@@ -26,7 +26,7 @@ class ReactionController extends Controller
         $user = Auth::user();
         $type = $request->type;
 
-        // ✅ FIX: Use IP + User ID for rate limiting
+        // FIX: Use IP + User ID for rate limiting
         $identifier = $user ? "user:{$user->id}" : "ip:{$request->ip()}";
         $key = "reaction:{$identifier}";
         

@@ -68,6 +68,11 @@ class PublicPostController extends Controller
 
     public function show(Post $post)
     {
+        // Check if post was soft deleted (if using soft deletes)
+        if ($post->trashed()) {
+            abort(410, 'This post has been permanently removed.');
+        }
+
         // Check if post is published
         if ($post->status !== PostStatus::Published) {
             abort(404, 'This post is not available.');

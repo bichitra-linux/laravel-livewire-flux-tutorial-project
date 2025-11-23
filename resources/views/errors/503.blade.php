@@ -62,9 +62,9 @@
                 </p>
             </div>
 
-            <div class="space-y-4 mb-8">
+            <div class="space-y-4 mb-4">
                 <div class="flex items-center gap-3 text-left bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm">
-                    <svg class="w-6 h-6 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <svg class="w-6 h-6 text-green-500 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
                     </svg>
                     <div>
@@ -74,7 +74,7 @@
                 </div>
 
                 <div class="flex items-center gap-3 text-left bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm">
-                    <svg class="w-6 h-6 text-blue-500 flex-shrink-0 animate-spin" fill="currentColor" viewBox="0 0 20 20">
+                    <svg class="w-6 h-6 text-blue-500 shrink-0 animate-spin" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd"></path>
                     </svg>
                     <div>
@@ -84,7 +84,7 @@
                 </div>
 
                 <div class="flex items-center gap-3 text-left bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm opacity-50">
-                    <svg class="w-6 h-6 text-gray-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <svg class="w-6 h-6 text-gray-400 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
                     </svg>
                     <div>
@@ -102,13 +102,14 @@
                     </svg>
                     Check Again
                 </button>
-
+{{-- 
                 <p class="text-sm text-gray-500 dark:text-gray-400">
                     Questions? Email us at 
-                    <a href="mailto:support@{{ config('app.name') }}.com" class="text-blue-600 dark:text-blue-400 hover:underline">
-                        support@{{ strtolower(config('app.name')) }}.com
+                    <a href="mailto:support@{{ \Illuminate\Support\Str::slug(config('app.name')) }}.com" class="text-blue-600 dark:text-blue-400 hover:underline">
+                        support@{{ \Illuminate\Support\Str::slug(config('app.name')) }}.com
                     </a>
-                </p>
+                </p> --}}
+            </div>
             </div>
         </div>
     </div>

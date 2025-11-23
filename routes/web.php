@@ -159,3 +159,30 @@ Route::middleware(['auth', 'verified', 'user.only'])->prefix('user')->group(func
         )
         ->name('user.two-factor.show');
 });
+
+
+// ✅ ERROR TEST ROUTES (only in debug mode)
+if (config('app.debug')) {
+    // Phase 1 & 2 tests
+    Route::get('/test-401', fn() => abort(401));
+    Route::get('/test-403', fn() => abort(403, 'Access denied'));
+    Route::get('/test-404', fn() => abort(404));
+    Route::get('/test-405', fn() => abort(405));
+    Route::get('/test-410', fn() => abort(410));
+    Route::get('/test-419', fn() => throw new \Illuminate\Session\TokenMismatchException);
+    Route::get('/test-422', function() {
+        throw \Illuminate\Validation\ValidationException::withMessages([
+            'email' => ['The email field is required.'],
+            'title' => ['The title must be at least 10 characters.'],
+        ]);
+    });
+    Route::get('/test-429', fn() => abort(429));
+    Route::get('/test-500', fn() => throw new \Exception('Test server error'));
+    Route::get('/test-503', fn() => abort(503));
+
+    // Phase 3 tests
+    Route::get('/test-400', fn() => abort(400, 'Bad request - Invalid data format'));
+    Route::get('/test-408', fn() => abort(408, 'Request timeout'));
+    Route::get('/test-502', fn() => abort(502, 'Bad gateway'));
+    Route::get('/test-504', fn() => abort(504, 'Gateway timeout'));
+}

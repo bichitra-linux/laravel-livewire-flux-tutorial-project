@@ -60,6 +60,25 @@ class FortifyServiceProvider extends ServiceProvider
         $this->configureViews();
         $this->configureRateLimiting();
 
+        // ✅ Disable custom authenticateUsing in tests to use standard Fortify login
+        if (!app()->environment('testing')) {
+            Fortify::authenticateUsing(function (Request $request){
+                $user = User::where('email', $request->email)->first();
+
+                if ($user && Hash::check($request->password, $user->password)) {
+
+                    if (!$user->hasVerifiedEmail()){
+                        session()->flash('unverified', 'Please verify your email address before logging in.');
+                        return null;
+                    }
+
+                    return $user;
+                }
+
+                return null;
+            });
+        }
+
         Fortify::authenticateUsing(function (Request $request){
             $user = User::where('email', $request->email)->first();
 

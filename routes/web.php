@@ -50,7 +50,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/posts/{post}/reactions/{type?}', [ReactionController::class, 'users'])->name('reactions.users');
 });
 
-// ✅ ADMIN ROUTES (admin, editor, writer ONLY)
+//   ADMIN ROUTES (admin, editor, writer ONLY)
 Route::middleware(['auth', 'verified', 'admin.only'])->prefix('admin')->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -89,7 +89,7 @@ Route::middleware(['auth', 'verified', 'admin.only'])->prefix('admin')->group(fu
 
 
 
-    // ✅ Admin Settings (unique names)
+    //   Admin Settings (unique names)
 
     Route::get('confirm-password', fn() => view('livewire.auth.confirm-password'))
         ->name('admin.password.confirm');
@@ -124,7 +124,7 @@ Route::middleware(['auth', 'verified', 'admin.only'])->prefix('admin')->group(fu
         ->name('admin.two-factor.show');
 });
 
-// ✅ USER ROUTES (role:user ONLY)
+//   USER ROUTES (role:user ONLY)
 Route::middleware(['auth', 'verified', 'user.only'])->prefix('user')->group(function () {
     // Redirect /user to /user/settings/profile
     Route::redirect('/', 'settings/profile');
@@ -143,7 +143,7 @@ Route::middleware(['auth', 'verified', 'user.only'])->prefix('user')->group(func
         return redirect()->intended();
     })->name('user.password.confirm.store');
 
-    // ✅ User Settings (unique names)
+    //   User Settings (unique names)
     Volt::route('settings/profile', 'user.settings.profile')->name('user.profile.edit');
     Volt::route('settings/password', 'user.settings.password')->name('user.password.edit');
     Volt::route('settings/appearance', 'user.settings.appearance')->name('user.appearance.edit');
@@ -161,7 +161,7 @@ Route::middleware(['auth', 'verified', 'user.only'])->prefix('user')->group(func
 });
 
 
-// ✅ ERROR TEST ROUTES (only in debug mode)
+//   ERROR TEST ROUTES (only in debug mode)
 if (config('app.debug')) {
     // Phase 1 & 2 tests
     Route::get('/test-401', fn() => abort(401));

@@ -113,7 +113,7 @@ class PostSeeder extends Seeder
 
         $bar->finish();
         $this->command->newLine(2);
-        $this->command->info("✅ Successfully created {$postCount} posts for user: {$user->name}!");
+        $this->command->info("  Successfully created {$postCount} posts for user: {$user->name}!");
     }
 
     /**

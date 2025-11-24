@@ -355,10 +355,10 @@
     @push('scripts')
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script>
-            // ✅ Detect current theme
+            //   Detect current theme
             const isDarkMode = () => document.documentElement.classList.contains('dark');
             
-            // ✅ Theme-aware color function
+            //   Theme-aware color function
             const getThemeColors = () => {
                 const dark = isDarkMode();
                 return {
@@ -390,7 +390,7 @@
             let trafficChart = null;
             let deviceChart = null;
 
-            // ✅ Create/Update Traffic Chart
+            //   Create/Update Traffic Chart
             function createTrafficChart() {
                 const colors = getThemeColors();
                 const ctx = document.getElementById('trafficChart').getContext('2d');
@@ -486,7 +486,7 @@
             }
 
             @if($deviceStats->isNotEmpty())
-            // ✅ Create/Update Device Chart
+            //   Create/Update Device Chart
             function createDeviceChart() {
                 const colors = getThemeColors();
                 const ctx = document.getElementById('deviceChart').getContext('2d');
@@ -545,7 +545,7 @@
             }
             @endif
 
-            // ✅ Initialize charts
+            //   Initialize charts
             function initCharts() {
                 createTrafficChart();
                 @if($deviceStats->isNotEmpty())
@@ -553,10 +553,10 @@
                 @endif
             }
 
-            // ✅ Initialize on page load
+            //   Initialize on page load
             document.addEventListener('DOMContentLoaded', initCharts);
 
-            // ✅ Watch for theme changes
+            //   Watch for theme changes
             const observer = new MutationObserver((mutations) => {
                 mutations.forEach((mutation) => {
                     if (mutation.attributeName === 'class') {
@@ -571,7 +571,7 @@
                 attributeFilter: ['class']
             });
 
-            // ✅ Cleanup on page unload
+            //   Cleanup on page unload
             window.addEventListener('beforeunload', () => {
                 if (trafficChart) trafficChart.destroy();
                 if (deviceChart) deviceChart.destroy();

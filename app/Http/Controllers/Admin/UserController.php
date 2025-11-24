@@ -54,7 +54,7 @@ class UserController extends Controller
             'new_this_month' => User::whereMonth('created_at', now()->month)
                 ->whereYear('created_at', now()->year)
                 ->count(),
-            'admins' => User::role('admin')->count(), // ✅ This will now work
+            'admins' => User::role('admin')->count(), //   This will now work
         ];
 
         // Get all roles for filter dropdown

@@ -17,22 +17,22 @@ class AdminOnly
     {
         $user = $request->user();
 
-        // ✅ Check if user has admin/editor/writer role
+        //   Check if user has admin/editor/writer role
         if ($user && $user->hasAnyRole(['admin', 'editor', 'writer'])) {
             return $next($request);
         }
 
-        // ✅ Use abort(403) instead of redirect for authenticated users without permission
+        //   Use abort(403) instead of redirect for authenticated users without permission
         if ($user && $user->hasRole('user')) {
             abort(403, 'You do not have permission to access the admin area.');
         }
 
-        // ✅ Redirect unauthenticated users to login
+        //   Redirect unauthenticated users to login
         if (!$user) {
             return redirect()->route('login')->with('error', 'Please login to continue.');
         }
 
-        // ✅ Fallback: 403 for users without any role
+        //   Fallback: 403 for users without any role
         abort(403, 'Access denied.');
     }
 }

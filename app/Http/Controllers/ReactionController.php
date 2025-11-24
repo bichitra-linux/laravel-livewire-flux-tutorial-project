@@ -73,7 +73,7 @@ class ReactionController extends Controller
                 $message = 'Reaction added';
             }
 
-            // ✅ Clear cache
+            //   Clear cache
             $post->clearReactionCache();
 
             DB::commit();

@@ -269,7 +269,7 @@
                         <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3">
                             <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Status</p>
                             <p class="text-sm font-semibold ${subscriber.is_subscribed ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}">
-                                ${subscriber.is_subscribed ? '✅ Active' : '❌ Unsubscribed'}
+                                ${subscriber.is_subscribed ? '  Active' : '❌ Unsubscribed'}
                             </p>
                         </div>
 

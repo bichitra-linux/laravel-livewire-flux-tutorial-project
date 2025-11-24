@@ -55,6 +55,6 @@ class CategorySeeder extends Seeder
             );
         }
 
-        $this->command->info('✅ Successfully created ' . count($categories) . ' categories!');
+        $this->command->info('  Successfully created ' . count($categories) . ' categories!');
     }
 }

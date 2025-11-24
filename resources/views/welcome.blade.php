@@ -12,7 +12,7 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600&display=swap" rel="stylesheet" />
     
-    {{-- ✅ Use Vite instead of 2293 lines of inline CSS --}}
+    {{--   Use Vite instead of 2293 lines of inline CSS --}}
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 

@@ -111,7 +111,7 @@ class CommentSeeder extends Seeder
 
         $bar->finish();
         $this->command->newLine(2);
-        $this->command->info("✅ Successfully created {$totalComments} comments and {$totalReplies} replies!");
+        $this->command->info("  Successfully created {$totalComments} comments and {$totalReplies} replies!");
     }
 
     /**

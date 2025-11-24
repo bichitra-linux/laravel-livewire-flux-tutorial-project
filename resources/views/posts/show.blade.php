@@ -20,7 +20,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    {{-- ✅ SEO Meta Tags --}}
+    {{--   SEO Meta Tags --}}
     <x-seo-meta
         :title="$seoMeta['title']"
         :description="$seoMeta['description']"
@@ -117,10 +117,10 @@
                         {{-- ✨ MOVE REACTIONS HERE (After Content) ✨ --}}
                         <div class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
                             @auth
-                                {{-- ✅ Authenticated: Show FULL interactive reactions --}}
+                                {{--   Authenticated: Show FULL interactive reactions --}}
                                 <x-post-reactions :post="$post" :compact="false" />
                             @else
-                                {{-- ✅ Unauthenticated: Show read-only with login CTA --}}
+                                {{--   Unauthenticated: Show read-only with login CTA --}}
                                 @if($post->reactions->count() > 0)
                                     <div class="bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-6 border border-gray-200 dark:border-gray-700">
                                         <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
@@ -159,7 +159,7 @@
                                             </p>
                                         </div>
 
-                                        {{-- ✅ Login CTA --}}
+                                        {{--   Login CTA --}}
                                         <div class="p-4 bg-linear-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-2 border-blue-200 dark:border-blue-800 rounded-xl">
                                             <div class="flex items-start gap-3">
                                                 <div class="shrink-0">

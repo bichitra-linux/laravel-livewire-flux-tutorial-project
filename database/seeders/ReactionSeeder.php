@@ -131,7 +131,7 @@ class ReactionSeeder extends Seeder
      */
     private function displayStatistics(int $totalReactions): void
     {
-        $this->command->info("✅ Successfully created {$totalReactions} reactions!");
+        $this->command->info("  Successfully created {$totalReactions} reactions!");
         $this->command->newLine();
 
         // Get breakdown by type

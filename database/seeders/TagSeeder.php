@@ -108,6 +108,6 @@ class TagSeeder extends Seeder
             }
         }
 
-        $this->command->info("✅ Successfully created {$createdCount} new tags (Total: " . count($tags) . ")");
+        $this->command->info("  Successfully created {$createdCount} new tags (Total: " . count($tags) . ")");
     }
 }

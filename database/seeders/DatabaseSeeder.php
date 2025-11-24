@@ -24,7 +24,7 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        $this->command->info("✅ Main user created: {$user->email}");
+        $this->command->info("  Main user created: {$user->email}");
 
         // Seed in correct order (with dependencies)
         $this->call([

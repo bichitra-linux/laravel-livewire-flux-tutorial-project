@@ -25,7 +25,7 @@ class Comment extends Model
 
     protected $with = ['user'];
 
-    // ✅ AUTO-SANITIZE ON SAVE
+    //   AUTO-SANITIZE ON SAVE
     protected static function booted()
     {
         // Sanitize content before saving
@@ -181,7 +181,7 @@ class Comment extends Model
         $content = preg_replace('/ id\s*=\s*["\'][^"\']*["\']/i', '', $content);
         $content = preg_replace('/ data-\w+\s*=\s*["\'][^"\']*["\']/i', '', $content);
 
-        // ✅ STEP 7 REMOVED - No longer needed, Step 4 handles all <a> tags properly
+        //   STEP 7 REMOVED - No longer needed, Step 4 handles all <a> tags properly
 
         return trim($content);
     }
@@ -257,25 +257,25 @@ class Comment extends Model
         return Str::limit(strip_tags($this->content), $limit);
     }
 
-    // ✅ Already sanitized on save, just return it
+    //   Already sanitized on save, just return it
     public function getSafeContentAttribute()
     {
         return $this->content;
     }
 
-    // ✅ Get plain text version
+    //   Get plain text version
     public function getPlainTextAttribute()
     {
         return strip_tags($this->content);
     }
 
-    // ✅ Check if editable
+    //   Check if editable
     public function isEditable(): bool
     {
         return $this->created_at->diffInMinutes(now()) <= 15;
     }
 
-    // ✅ Get reply depth
+    //   Get reply depth
     public function getDepth(): int
     {
         $depth = 0;

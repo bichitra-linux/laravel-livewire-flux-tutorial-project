@@ -77,13 +77,13 @@ class RoleAndPermissionSeeder extends Seeder
             'view posts',
         ]);
 
-        $this->command->info('✅ Roles and permissions created successfully!');
+        $this->command->info('  Roles and permissions created successfully!');
 
         // Assign admin role to the main user
         $adminUser = User::where('email', 'est@gmail.com')->first();
         if ($adminUser && !$adminUser->hasRole('admin')) {
             $adminUser->assignRole('admin');
-            $this->command->info('✅ Admin role assigned to est@gmail.com');
+            $this->command->info('  Admin role assigned to est@gmail.com');
         }
 
         // Create sample users with different roles
@@ -106,7 +106,7 @@ class RoleAndPermissionSeeder extends Seeder
         );
         if (!$editor->hasRole('editor')) {
             $editor->assignRole('editor');
-            $this->command->info('✅ Editor user created: editor@example.com');
+            $this->command->info('  Editor user created: editor@example.com');
         }
 
         // Writer user
@@ -120,7 +120,7 @@ class RoleAndPermissionSeeder extends Seeder
         );
         if (!$writer->hasRole('writer')) {
             $writer->assignRole('writer');
-            $this->command->info('✅ Writer user created: writer@example.com');
+            $this->command->info('  Writer user created: writer@example.com');
         }
 
         // Regular user
@@ -134,7 +134,7 @@ class RoleAndPermissionSeeder extends Seeder
         );
         if (!$regularUser->hasRole('user')) {
             $regularUser->assignRole('user');
-            $this->command->info('✅ Regular user created: user@example.com');
+            $this->command->info('  Regular user created: user@example.com');
         }
 
         // Unverified user (no role)
@@ -146,6 +146,6 @@ class RoleAndPermissionSeeder extends Seeder
                 'email_verified_at' => null, // Not verified
             ]
         );
-        $this->command->info('✅ Unverified user created: unverified@example.com');
+        $this->command->info('  Unverified user created: unverified@example.com');
     }
 }

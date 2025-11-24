@@ -806,6 +806,10 @@
             function attachEventListeners() {
                 const themeBtn = document.getElementById('theme-toggle');
                 const weatherBtn = document.getElementById('weather-content');
+                const mobileMenuToggle = document.getElementById('mobile-menu-toggle'); // Add this
+                const mobileMenu = document.getElementById('mobile-menu'); // Add this
+                const menuOpenIcon = document.getElementById('menu-open-icon'); // Add this
+                const menuCloseIcon = document.getElementById('menu-close-icon'); // Add this
 
                 if (themeBtn) {
                     const newThemeBtn = themeBtn.cloneNode(true);
@@ -818,6 +822,18 @@
                     weatherBtn.replaceWith(newWeatherBtn);
                     newWeatherBtn.addEventListener('click', () => {
                         fetchWeather(true);
+                    });
+                }
+
+                // Add mobile menu toggle
+                if (mobileMenuToggle && mobileMenu && menuOpenIcon && menuCloseIcon) {
+                    const newToggle = mobileMenuToggle.cloneNode(true);
+                    mobileMenuToggle.replaceWith(newToggle);
+                    newToggle.addEventListener('click', () => {
+                        const isOpen = !mobileMenu.classList.contains('hidden');
+                        mobileMenu.classList.toggle('hidden');
+                        menuOpenIcon.classList.toggle('hidden', isOpen);
+                        menuCloseIcon.classList.toggle('hidden', !isOpen);
                     });
                 }
             }

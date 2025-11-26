@@ -23,6 +23,9 @@ class AnalyticsController extends Controller
             'new_visitors' => $this->countNewVisitors($cutoffDate),
             'return_rate' => $this->computeReturnRate($cutoffDate),
             'engagement_rate' => $this->computeEngagementRate($cutoffDate),
+            // New: Add all-route statistics
+            'total_all_views' => $this->countTotalViews($cutoffDate),
+            'unique_all_visitors' => $this->countUniqueAllVisitors($cutoffDate),
         ];
 
         $popularPosts = $this->fetchPopularPosts($cutoffDate);
@@ -35,6 +38,11 @@ class AnalyticsController extends Controller
         $peakHour = $this->getPeakTrafficHour($cutoffDate);
         $weeklyGrowth = $this->calculateWeeklyGrowth();
 
+        // New: Add all-route data
+        $popularPages = $this->getPopularPages($cutoffDate);
+        $eventTypeStats = $this->getEventTypeStats($cutoffDate);
+        $routeStats = $this->getRouteStats($cutoffDate);
+
         return view('analytics.index', [
             'stats' => $statistics,
             'topPosts' => $popularPosts,
@@ -44,6 +52,11 @@ class AnalyticsController extends Controller
             'peakDay' => $peakDay,
             'peakHour' => $peakHour,
             'weeklyGrowth' => $weeklyGrowth,
+
+            // New: Add new data to view
+            'popularPages' => $popularPages,
+            'eventTypeStats' => $eventTypeStats,
+            'routeStats' => $routeStats,
         ]);
     }
 
@@ -276,5 +289,71 @@ class AnalyticsController extends Controller
         }
 
         return round((($thisWeek - $lastWeek) / $lastWeek) * 100, 1);
+    }
+
+    // New methods for all-route tracking
+    private function countTotalViews($since)
+    {
+        return Analytics::where('created_at', '>=', $since)->count();
+    }
+
+    private function countUniqueAllVisitors($since)
+    {
+        return Analytics::where('created_at', '>=', $since)
+            ->distinct('ip_address')
+            ->count('ip_address');
+    }
+
+    private function getPopularPages($since)
+    {
+        return Analytics::where('created_at', '>=', $since)
+            ->selectRaw("JSON_EXTRACT(metadata, '$.route_name') as route, event_type, count(*) as views")
+            ->groupBy('route', 'event_type')
+            ->orderBy('views', 'desc')
+            ->take(20)
+            ->get()
+            ->map(function ($item) {
+                $item->page_name = $this->getPageName($item->route);
+                return $item;
+            });
+    }
+
+    private function getPageName(?string $route): string
+    {
+
+        if (!$route) {
+            return 'Unknown Route';
+        }
+        return match ($route) {
+            'home' => 'Homepage',
+            'about' => 'About Page',
+            'contact' => 'Contact Page',
+            'terms' => 'Terms of Service',
+            'privacy' => 'Privacy Policy',
+            'public.posts.index' => 'Blog Listing',
+            'public.posts.show' => 'Individual Posts',
+            'admin.dashboard' => 'Admin Dashboard',
+            'user.settings.profile' => 'User Profile Settings',
+            default => ucfirst(str_replace(['.', '_'], [' ', ' '], $route)),
+        };
+    }
+
+    private function getEventTypeStats($since)
+    {
+        return Analytics::where('created_at', '>=', $since)
+            ->select('event_type', DB::raw('count(*) as count'))
+            ->groupBy('event_type')
+            ->orderBy('count', 'desc')
+            ->get();
+    }
+
+    private function getRouteStats($since)
+    {
+        return Analytics::where('created_at', '>=', $since)
+            ->selectRaw("JSON_EXTRACT(metadata, '$.route_name') as route, count(*) as count")
+            ->groupBy('route')
+            ->orderBy('count', 'desc')
+            ->take(20)
+            ->get();
     }
 }

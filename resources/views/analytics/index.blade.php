@@ -189,6 +189,97 @@
             </div>
         </div>
 
+        {{-- New: All-Route Analytics Sections --}}
+        <div class="grid gap-6 lg:grid-cols-3">
+            {{-- Popular Pages --}}
+            <div class="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-lg">
+                <h2 class="text-xl font-bold text-zinc-900 dark:text-white mb-4 flex items-center gap-2">
+                    <svg class="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    Popular Pages
+                </h2>
+                @if(isset($popularPages) && $popularPages->isNotEmpty())
+                    <div class="space-y-3">
+                        @foreach($popularPages as $page)
+                            <div class="flex items-center justify-between p-3 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-700/50 transition-colors">
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm font-medium text-zinc-900 dark:text-white truncate">
+                                        {{ $page->page_name }}
+                                    </p>
+                                    <p class="text-xs text-zinc-500 dark:text-zinc-400">
+                                        {{ ucfirst(str_replace('_', ' ', $page->event_type)) }}
+                                    </p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-lg font-bold text-zinc-900 dark:text-white">{{ number_format($page->views) }}</p>
+                                    <p class="text-xs text-zinc-500 dark:text-zinc-400">views</p>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <p class="text-center py-8 text-zinc-500">No page data available</p>
+                @endif
+            </div>
+
+            {{-- Event Types --}}
+            <div class="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-lg">
+                <h2 class="text-xl font-bold text-zinc-900 dark:text-white mb-4 flex items-center gap-2">
+                    <svg class="w-6 h-6 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path>
+                    </svg>
+                    Event Types
+                </h2>
+                @if(isset($eventTypeStats) && $eventTypeStats->isNotEmpty())
+                    <div class="space-y-3">
+                        @foreach($eventTypeStats as $event)
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-medium text-zinc-900 dark:text-white capitalize">
+                                    {{ str_replace('_', ' ', $event->event_type) }}
+                                </span>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-sm font-bold text-zinc-900 dark:text-white">{{ number_format($event->count) }}</span>
+                                    <span class="text-xs text-zinc-500 dark:text-zinc-400">
+                                        ({{ $stats['total_all_views'] > 0 ? round(($event->count / $stats['total_all_views']) * 100, 1) : 0 }}%)
+                                    </span>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <p class="text-center py-8 text-zinc-500">No event data available</p>
+                @endif
+            </div>
+
+            {{-- Route Stats --}}
+            <div class="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-lg">
+                <h2 class="text-xl font-bold text-zinc-900 dark:text-white mb-4 flex items-center gap-2">
+                    <svg class="w-6 h-6 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path>
+                    </svg>
+                    Top Routes
+                </h2>
+                @if(isset($routeStats) && $routeStats->isNotEmpty())
+                    <div class="space-y-3">
+                        @foreach($routeStats as $route)
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-medium text-zinc-900 dark:text-white truncate max-w-[180px]">
+                                    {{ $route->route ?? 'Unknown' }}
+                                </span>
+                                <span class="text-sm font-bold text-zinc-900 dark:text-white">{{ number_format($route->count) }}</span>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <p class="text-center py-8 text-zinc-500">No route data available</p>
+                @endif
+            </div>
+        </div>
+
         {{-- Traffic Chart --}}
         <div class="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-lg">
             <div class="flex items-center justify-between mb-6">
@@ -322,7 +413,7 @@
                                     $colors = $deviceColors[strtolower($device)] ?? ['bg' => 'bg-zinc-100', 'text' => 'text-zinc-600', 'bar' => 'bg-zinc-600'];
                                 @endphp
 
-                                <div class="flex items-center justify-between p-6 rounded-lg {{ $colors['bg'] }}">
+                                <div class="flex items-center justify-between p-6 rounded-lg {{ $colors['bg'] }} border border-zinc-200 dark:border-zinc-700">
                                     <span class="text-sm font-medium {{ $colors['text'] }} capitalize">{{ $device }}</span>
                                     <div class="flex items-center gap-2">
                                         <span
@@ -589,7 +680,7 @@
                                     bodyColor: '#fff',
                                     borderColor: colors.tooltipBorder,
                                     borderWidth: 1,
-                                    padding: 12,
+                                    padding: 8,
                                     cornerRadius: 8,
                                     callbacks: {
                                         label: function (context) {

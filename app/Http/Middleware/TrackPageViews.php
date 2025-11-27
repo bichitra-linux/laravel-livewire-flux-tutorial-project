@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use App\Models\Analytics;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Symfony\Component\HttpFoundation\Response;
 
 class TrackPageViews
@@ -51,6 +52,8 @@ class TrackPageViews
     {
         $routeName = $request->route()?->getName();
         $eventType = $this->determineEventType($routeName);
+        // Add geolocation (requires IP geolocation service)
+        $location = $this->getLocationFromIP($request->ip());
 
         // Get post if it's a post route
         $post = $routeName === 'public.posts.show' ? $request->route('post') : null;
@@ -68,10 +71,24 @@ class TrackPageViews
                 'route_name' => $routeName,
                 'method' => $request->method(),
                 'url' => $request->fullUrl(),
+                'country' => $location['country'] ?? null,
+                'city' => $location['city'] ?? null,
+                'region' => $location['region'] ?? null,
             ],
             'created_at' => now(),
         ]);
     }
+
+    private function getLocationFromIP(string $ip): array
+{
+    // Use a service like ipapi.co or maxmind
+    try {
+        $response = Http::get("http://ipapi.co/{$ip}/json/");
+        return $response->json();
+    } catch (\Exception $e) {
+        return [];
+    }
+}
 
     private function determineEventType(string $routeName): string
     {

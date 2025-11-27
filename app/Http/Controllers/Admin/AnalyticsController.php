@@ -26,13 +26,14 @@ class AnalyticsController extends Controller
             // New: Add all-route statistics
             'total_all_views' => $this->countTotalViews($cutoffDate),
             'unique_all_visitors' => $this->countUniqueAllVisitors($cutoffDate),
+            'geographic_stats' => $this->getGeographicStats($cutoffDate),
         ];
 
         $popularPosts = $this->fetchPopularPosts($cutoffDate);
         $trafficByDay = $this->fetchDailyTraffic($cutoffDate);
         $deviceBreakdown = $this->fetchDeviceBreakdown($cutoffDate);
         $browserStats = $this->fetchBrowserStats($cutoffDate);
-        
+
         // Additional insights
         $peakDay = $this->getPeakTrafficDay($trafficByDay);
         $peakHour = $this->getPeakTrafficHour($cutoffDate);
@@ -42,6 +43,7 @@ class AnalyticsController extends Controller
         $popularPages = $this->getPopularPages($cutoffDate);
         $eventTypeStats = $this->getEventTypeStats($cutoffDate);
         $routeStats = $this->getRouteStats($cutoffDate);
+        $geographicStats = $this->getGeographicStats($cutoffDate);
 
         return view('analytics.index', [
             'stats' => $statistics,
@@ -57,6 +59,7 @@ class AnalyticsController extends Controller
             'popularPages' => $popularPages,
             'eventTypeStats' => $eventTypeStats,
             'routeStats' => $routeStats,
+            'geographicStats' => $geographicStats,
         ]);
     }
 
@@ -91,7 +94,7 @@ class AnalyticsController extends Controller
     private function computeReturnRate($since)
     {
         $totalVisitors = $this->countUniqueVisitors($since);
-        
+
         if ($totalVisitors === 0) {
             return 0;
         }
@@ -109,7 +112,7 @@ class AnalyticsController extends Controller
     private function computeEngagementRate($since)
     {
         $totalViews = $this->countPostViews($since);
-        
+
         if ($totalViews === 0) {
             return 0;
         }
@@ -140,12 +143,12 @@ class AnalyticsController extends Controller
     private function fetchPopularPosts($since)
     {
         return Post::select([
-                'posts.id',
-                'posts.title',
-                'posts.slug',
-                'posts.category_id',
-                'posts.created_at'
-            ])
+            'posts.id',
+            'posts.title',
+            'posts.slug',
+            'posts.category_id',
+            'posts.created_at'
+        ])
             ->with('category:id,name')
             ->leftJoin('analytics', function ($join) use ($since) {
                 $join->on('posts.id', '=', 'analytics.post_id')
@@ -213,7 +216,7 @@ class AnalyticsController extends Controller
             $startTime = $sessionViews->first()->created_at;
             $endTime = $sessionViews->last()->created_at;
             $sessionDuration = $endTime->diffInSeconds($startTime);
-            
+
             if ($sessionDuration > 0 && $sessionDuration <= 3600) {
                 $totalSeconds += $sessionDuration;
                 $validSessionCount++;
@@ -354,6 +357,17 @@ class AnalyticsController extends Controller
             ->groupBy('route')
             ->orderBy('count', 'desc')
             ->take(20)
+            ->get();
+    }
+
+    private function getGeographicStats($since)
+    {
+        return Analytics::where('created_at', '>=', $since)
+            ->selectRaw("JSON_EXTRACT(metadata, '$.country') as country, count(*) as count")
+            ->whereRaw("JSON_EXTRACT(metadata, '$.country') IS NOT NULL")
+            ->groupBy('country')
+            ->orderBy('count', 'desc')
+            ->take(10)
             ->get();
     }
 }

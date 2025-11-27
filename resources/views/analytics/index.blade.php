@@ -279,6 +279,34 @@
                 @endif
             </div>
         </div>
+        {{-- Geographic Analytics --}}
+        <div class="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-lg">
+            <h2 class="text-xl font-bold text-zinc-900 dark:text-white mb-4 flex items-center gap-2">
+                <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064"></path>
+                </svg>
+                Top Countries (Last 30 Days)
+            </h2>
+            <div class="space-y-3">
+                @forelse($geographicStats as $stat)
+                    <div class="flex items-center justify-between p-3 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-700/50 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-6 bg-linear-to-r from-blue-500 to-purple-600 rounded flex items-center justify-center">
+                                <span class="text-xs font-bold text-white">{{ substr($stat->country, 0, 2) }}</span>
+                            </div>
+                            <span class="text-sm font-medium text-zinc-900 dark:text-white">{{ $stat->country }}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm font-bold text-zinc-900 dark:text-white">{{ number_format($stat->count) }}</span>
+                            <span class="text-xs text-zinc-500 dark:text-zinc-400">visits</span>
+                        </div>
+                    </div>
+                @empty
+                    <p class="text-center py-8 text-zinc-500">No geographic data found</p>
+                @endforelse
+            </div>
+        </div>
 
         {{-- Traffic Chart --}}
         <div class="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-lg">

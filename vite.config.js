@@ -16,12 +16,6 @@ export default defineConfig({
         tailwindcss(),
     ],
     server: {
-        https: true,
-        host: "0.0.0.0",
-        port: 5173,
-        hmr: {
-            host: "large-candies-wonder.loca.lt",  // Replace with your current Vite tunnel URL (e.g., https://93c84f84e5c9.ngrok-free.app)
-        },
-        allowedHosts: [".ngrok-free.app", ".ngrok.io"],  // Allow ngrok domains
+        cors: true,
     },
 });

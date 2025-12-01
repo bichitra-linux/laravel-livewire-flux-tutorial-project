@@ -24,6 +24,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'password.confirm' => \App\Http\Middleware\RequirePasswordConfirmation::class,
             'track.views' => \App\Http\Middleware\TrackPageViews::class,
         ]);
+
+        $middleware->trustProxies(
+            at: '*', // Trust all proxies (safe for local development with ngrok)
+        );
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

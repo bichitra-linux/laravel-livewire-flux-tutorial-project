@@ -9,6 +9,7 @@ use App\Enums\PostStatus;
 use App\Models\Category;
 use Illuminate\Support\Facades\Cookie;
 
+
 class PublicPostController extends Controller
 {
     //

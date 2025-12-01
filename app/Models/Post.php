@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;  // Add this import
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use App\Enums\PostStatus;
@@ -13,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 class Post extends Model
 {
     use HasFactory;
+    use SoftDeletes;  // Add this trait
 
     protected $fillable = [
         'title',

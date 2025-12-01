@@ -75,7 +75,7 @@ class PostController extends Controller
                 'dimensions:min_width=100,min_height=100,max_width=4000,max_height=4000'
             ],
             'category_id' => 'required|exists:categories,id',
-            'tags' => 'nullable|array',
+            'tags' => 'nullable|string',
             'tags.*' => 'exists:tags,id',
             'status' => 'required|in:draft,published,archived',
         ]);
@@ -92,10 +92,21 @@ class PostController extends Controller
 
         $post = Auth::user()->posts()->create($validated);
 
-        // Handle tags
-        if (isset($validated['tags'])) {
-            $post->tags()->attach($validated['tags']);
+        // Handle tags: Parse comma-separated string and create/find tags
+        $tagIds = [];
+        if ($request->filled('tags')) {
+            $tagNames = array_map('trim', explode(',', $request->tags));
+            foreach ($tagNames as $name) {
+                if (!empty($name)) {
+                    $tag = Tag::firstOrCreate([
+                        'name' => $name,
+                        'slug' => Str::slug($name)
+                    ]);
+                    $tagIds[] = $tag->id;
+                }
+            }
         }
+        $post->tags()->attach($tagIds);
 
         return redirect()->route('posts.index')
             ->with('success', 'Post created successfully!');
@@ -151,7 +162,7 @@ class PostController extends Controller
                 'dimensions:min_width=100,min_height=100,max_width=4000,max_height=4000'
             ],
             'category_id' => 'required|exists:categories,id',
-            'tags' => 'nullable|array',
+            'tags' => 'nullable|string',
             'tags.*' => 'exists:tags,id',
             'status' => 'required|in:draft,published,archived',
         ]);
@@ -171,9 +182,21 @@ class PostController extends Controller
 
         $post->update($validated);
 
-        if (isset($validated['tags'])) {
-            $post->tags()->sync($validated['tags']);
+        // Handle tags: Parse and sync
+        $tagIds = [];
+        if ($request->filled('tags')) {
+            $tagNames = array_map('trim', explode(',', $request->tags));
+            foreach ($tagNames as $name) {
+                if (!empty($name)) {
+                    $tag = Tag::firstOrCreate([
+                        'name' => $name,
+                        'slug' => Str::slug($name)
+                    ]);
+                    $tagIds[] = $tag->id;
+                }
+            }
         }
+        $post->tags()->sync($tagIds);
 
         return redirect()->route('posts.index')
             ->with('success', 'Post updated successfully!');

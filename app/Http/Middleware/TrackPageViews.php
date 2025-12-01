@@ -72,9 +72,9 @@ class TrackPageViews
                 'route_name' => $routeName,
                 'method' => $request->method(),
                 'url' => $request->fullUrl(),
-                'country' => $location['country'],
-                'city' => $location['city'],
-                'region' => $location['region'],
+                'country' => $location['country'] ?? null,
+                'city' => $location['city'] ?? null,
+                'region' => $location['region'] ?? null,
             ],
             'created_at' => now(),
         ]);
@@ -84,8 +84,8 @@ class TrackPageViews
 {
     // Use ipapi.co
     try {
-        $response = Http::get("http://ipapi.co/{$ip}/json/");
-        return $response->json();
+        $response = Http::get("https://ipapi.co/{$ip}/json/");
+        return $response->successful() ? ($response->json() ?? []) : [];
     } catch (\Exception $e) {
         return [];
     }

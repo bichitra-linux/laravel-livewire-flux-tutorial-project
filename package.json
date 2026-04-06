@@ -14,7 +14,7 @@
         "laravel-vite-plugin": "^2.0",
         "quill": "^2.0.3",
         "tailwindcss": "^4.1.16",
-        "vite": "^7.2.1"
+        "vite": "^7.3.2"
     },
     "optionalDependencies": {
         "@rollup/rollup-linux-x64-gnu": "4.52.5",
